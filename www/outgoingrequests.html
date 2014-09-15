@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>BraggN</title>
+	<link rel="stylesheet" href="css/mobile.css">
+	<link rel="stylesheet" href="css/semantic.css">
+    <link rel="stylesheet" href="css/swipebox.min.css">
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="js/general_function.js"></script>
+    <script type="text/javascript">        
+        $( document ).ready(function() {
+            //get session userid
+            var session_userid = window.localStorage.getItem("session_userid");
+           // alert(session_userid);
+            $.ajax({ 
+                type: 'POST',
+                url: 'http://www.braggn.com/mobile/mobile_user_friends_requests.php',
+				dataType: "json",
+                data: {
+						owner_user_id : session_userid,
+						request: 'outgoing'
+				},
+                  
+                success:function (response) {
+						
+                        if(response != ''){      		   
+                                                    
+                          $.each(response, function(i, item) {
+								var username = response[i].user_info.user_username;
+							  	var user_photo;
+								if(response[i].user_info.user_photo != ''){
+							  		user_photo = "http://www.braggn.com/uploads_user/1000/"+response[i].user_info.user_id+"/"+response[i].user_info.user_photo;
+								}else{
+									user_photo = "img/nophoto.gif";
+								}
+								
+								$('#friend_requests').append(' <div class="eight wide column"><div class="ui segment"><img class="ui rounded mini left floated image" src="'+user_photo+'"> <a onclick="other_user_profile('+response[i].user_info.user_id+');" class="left floated">'+ response[i].user_info.user_username+'</a><br/><div class="ui left floated buttons"><div class="mini ui button" onclick="cancel_outgoing_request(\''+username+'\');">Cancel Request</div></div></div></div>');
+                            });                          
+                        }else{ 
+							  $('#friend_requests').removeClass('grid');
+                              $('#friend_requests').html('You don\'t have any outgoing friend request.');                            
+                        }                    
+                },
+                 error: function (){
+                    alert('error occured: Please try after some time.');
+                    return false;
+                 },
+            });		
+          
+       });   
+	   
+	   
+        </script>
+</head>
+ <body>
+ 	<div class="ui right thin blue vertical demo sidebar menu">
+		<div class="item ui icon input">
+		  <input type="text" placeholder="Search...">
+		</div>
+		<a class="item" href="index.html">
+			Home
+		</a>
+		<a class="item" href="activity.html">
+			BraggN Page
+		</a>
+		<a class="item" href="profile.html">
+			Profile
+		</a>
+		<a class="item" href="competition.html">
+			Competitions
+		</a>
+         <a class="active item" href="friends.html">
+			Friends
+		</a>
+		<a class="item" href="notifications.html">
+			Notifications
+		</a>          
+		<a class="item" href="settings.html">
+			Settings
+		</a>     
+        <a class="item" onclick="logout();">
+			<span>Logout</span>
+		</a>
+		<div class="item">
+			<b>More</b>
+		<div class="menu">
+		  <a href="aboutus.html" class="item">About</a>
+		  <a href="contactus.html" class="item">Contact Us</a>
+		</div>
+		</div>
+	</div>
+	<div data-role="page" id="mainPage" style="z-index: 9999">
+		<div data-role="content">
+			<header>
+				<div id="social">
+					<ul>
+						<li class="icon-facebook" title="Facebook"><a href="https://www.facebook.com/pages/Braggncom/1392778994316222" target="_blank"></a></li>
+						<li class="icon-twitter" title="Twitter"><a href="https://twitter.com/braggncom" target="_blank"></a></li>
+						<li class="icon-vine" title="Vine"><a href="https://vine.co/braggn.com" target="_blank"></a></li>
+						<li class="icon-instagram" title="Instagram"><a href="http://instagram.com/braggncom" target="_blank"></a></li>	
+					</ul>
+				</div>
+				<a href="index.html"><img src="img/BraggN_banner_animated.gif"></a>
+			</header>
+		</div>
+		<div id="content" class="rounded">
+			<div class="page-title left floated column">
+				<h2 class="ui left floated column">Friends</h2>
+			</div>
+			<div class="small ui green button icon toggle button right floated column" data-variation=".right">
+				<i class="reorder icon"></i>
+			</div>
+			<div class="ui feed">
+				<div class="clearfix">
+					<div class="ui left floated buttons">
+					  <div class="mini ui button" onclick="location.href='requests.html';">Requests</div>
+					  <div class="mini ui button" style="color:#0099cb" onclick="location.href='outgoingrequests.html';">Outgoing Requests</div>
+					  <div class="mini ui button" onclick="location.href='users.html';">Search Friends</div>
+					</div>
+				</div>
+				<br/>
+				<br/>
+				<div class="clearfix ui grid" id="friend_requests"></div>
+		</div>
+	</div>
+	<footer class="rounded">
+		&copy; BraggN
+	</footer>   
+	<script src="js/semantic.min.js"></script>
+	<script type="text/javascript">
+		$('.demo.sidebar').first()
+		  .sidebar('attach events', '.toggle.button')
+		;
+		$('.ui.dropdown').dropdown();
+	</script>    
+
+ </body>
+ </body>
+ </html>

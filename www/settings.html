@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>BraggN</title>
+    <link rel="stylesheet" href="css/mobile.css">
+	<link rel="stylesheet" href="css/semantic.css">
+	<link rel="stylesheet" href="css/swipebox.min.css">
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700' rel='stylesheet' type='text/css'>     
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/bragg.js"></script>
+    <script src="js/general_function.js"></script>
+	<style>
+        .modalDialog > div {
+            width: 210px; 
+			height:265px;
+        }
+    </style>
+</head>
+ <body>
+	<div class="ui right thin blue vertical demo sidebar menu">
+		
+		<a class="item" href="index.html">
+			Home
+		</a>
+		<a class="item" href="activity.html">
+			BraggN Page
+		</a>
+		<a class="item" href="profile.html">
+			Profile
+		</a>
+		<a class="item" href="competition.html">
+			Competitions
+		</a>
+         <a class="item" href="friends.html">
+			Friends
+		</a>
+		<a class="item" href="notifications.html">
+			Notifications
+		</a>
+          
+		<a class="active item" href="settings.html">
+			Settings
+		</a>     
+        <a class="item" onclick="logout();">
+			<span>Logout</span>
+		</a>
+		<div class="item">
+			<b>More</b>
+		<div class="menu">
+		  <a href="aboutus.html" class="item">About</a>
+		  <a href="contactus.html" class="item">Contact Us</a>
+		</div>
+		</div>
+	</div>
+	<div data-role="page" id="mainPage" style="z-index: 9999">
+		<div data-role="content">
+			<header>
+            	<div id="social">
+					<ul>
+						<li><a href="https://www.facebook.com/pages/Braggncom/1392778994316222" target="_blank"><img src="img/fb.png"></a></li>
+                        <li><a href="https://twitter.com/braggncom" target="_blank"><img src="img/tw.png"></a></li>
+                        <li><a href="https://vine.co/braggn.com" target="_blank"><img src="img/vine-16.png"></a></li>
+                        <li><a href="http://instagram.com/braggncom" target="_blank"><img src="img/Instagram-16.png"></a></li>
+                        <li><a  href="https://plus.google.com/100216016506071395783" rel="publisher" target="_blank"><img src="img/google_circle-16.png"></a></li>
+					</ul>
+				</div>
+				<a href="index.html"><img src="img/BraggN_banner_animated.gif"></a>				
+			 </header>
+			<div id="intro_video">
+				<a href="http://www.braggn.com/include/BraggN-Intro-Animation-2A_sound.mp4" class="html5lightbox" data-width="400" data-height="250" title="LEARN ABOUT BRAGGN">
+					<img src="img/youtube.png">
+				</a>
+			</div>
+		 </div>	
+		<div id="content" class="rounded clearfix">
+			<div class="page-title left floated column">
+				<h2 class="ui left floated column">Account Settings</h2>
+			</div>
+			<div class="small ui green button icon toggle button right floated column" data-variation=".right">
+				<i class="reorder icon"></i>
+			</div>
+			<br/>
+			<br/>
+			<div class="ui divided list clearfix">
+				<div class="item">
+					<div class="settingsEdit right floated tiny ui button" id="edit_username">Edit</div>
+					<div class="content">
+						<div class="header">Username</div>
+						<span class="settingsContent">
+							<div class="edit_username" style="overflow:hidden;white-space:nowrap;width:200px;height:20px;border:1px" contentEditable="false"></div>
+						</span>
+					</div>
+				</div>
+				<div class="item">
+					<div class="settingsEdit right floated tiny ui button" id="edit_firstname">Edit</div>
+					<div class="content">
+						<div class="header">First Name</div>
+						<span class="settingsContent">
+							<div class="edit_firstname" style="overflow:hidden;white-space:nowrap;width:200px;height:20px;border:1px " contentEditable="false"></div>
+						</span>
+					</div>
+				</div>
+				<div class="item">
+					<div class="settingsEdit right floated tiny ui button" id="edit_lastname">Edit</div>
+					<div class="content">
+						<div class="header">Last Name</div>
+						<span class="settingsContent">
+							<div class="edit_lastname" style="overflow:hidden;white-space:nowrap;width:200px;height:20px;border:1px " contentEditable="false"></div>
+						</span>
+					</div>
+				</div>
+				<div class="item">
+					<div class="settingsEdit right floated tiny ui button" id="edit_email">Edit</div>
+					<div class="content">
+						<div class="header">Email</div>
+						<span class="settingsContent">
+							<div class="edit_email" style="overflow:hidden;white-space:nowrap;width:200px;height:20px;border:1px " contentEditable="false"></div>
+						</span>
+					</div>
+				</div>
+				<div class="item">
+					<div class="settingsEdit right floated tiny ui button" id="edit_password">Edit</div>
+					<div class="content">
+						<div class="header">Password</div>
+							<span class="settingsContent">
+								<div class="update_password" style="overflow:hidden;white-space:nowrap;width:200px;height:20px;border:1px " contentEditable="false"></div>
+								<input type="password" name="update_pass" id="updated_password" style="display:none" size="30" maxlength="30"/><br/>
+							</span>
+					</div>
+				</div>
+				<div class="item">
+					<div class="settingsEdit right floated tiny ui button" id="edit_profile">Edit</div>
+					<div class="content">
+						<div class="header">Profile Privacy</div>
+						<span class="settingsContent" >	
+							<div id="profile_edit">						
+								<input type="radio"  name="edit_profile" value="1" > Private (Only Friends)
+								<br>
+								<input type="radio"  name="edit_profile" value="0" > Public (Anyone)							
+							</div>
+					</span>	
+					</div>
+				</div>
+                 
+                <div id="openModal" class="modalDialog">
+                    <div>
+                        <a href="" title="Close" class="close" onclick="javascript:window.location='settings.html'">X</a>
+                        <h2>Uploading</h2>
+                        <iframe src="http://www.braggn.com/mobile_user_editprofile_photo.php" style="height:226px;width:232px;"></iframe>
+                    </div>
+                </div>
+				<div class="item">                    
+					<!--<div class="settingsEdit right floated tiny ui button">Edit</div>-->
+                    <div class="settingsEdit right floated tiny ui button"><a href="#openModal">Edit</a></div>
+					<div class="content">
+						<div class="header">Profile Photo</div>
+						<br/>
+						<img class="ui small circular left floated image" id="profile_avatar" src="">
+					</div>
+				</div>
+				<div class="item">
+					<div class="content right floated">
+						<a class="delete_account negative tiny ui button" id="">Delete Account</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<footer class="rounded">
+		&copy; BraggN
+	</footer>
+
+	<script src="js/jquery.swipebox.min.js"></script>
+	<script type="text/javascript">
+		$('.swipebox').swipebox();
+	</script>
+	<script src="js/semantic.min.js"></script>
+	<script type="text/javascript">
+		$('.demo.sidebar').first()
+		  .sidebar('attach events', '.toggle.button')
+		;
+	</script>
+	
+ </body>
+ </html>

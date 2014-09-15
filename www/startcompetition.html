@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>BraggN</title>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="css/mobile.css">
+	<link rel="stylesheet" href="css/semantic.css"> 
+   
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script> 
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    
+    <script type="text/javascript" src="http://www.braggn.com/auto-suggest/src/jquery.tokeninput.js"></script>
+    <link rel="stylesheet" href="http://www.braggn.com/auto-suggest/styles/token-input.css" type="text/css" />
+    <link rel="stylesheet" href="http://www.braggn.com/auto-suggest/styles/token-input-facebook.css" type="text/css" />   
+    <script src="js/cordova.js"></script>
+    <script src="js/general_function.js"></script>
+    <script type="text/javascript">
+        function start_competition() {
+             $("#comp_submit").html("<span><img  src='img/ajax-loader3.gif' /> Processing... </span>");
+             var theme = $('#theme').val();
+             var description = $('#description').val();
+             var event_date_start_1 = $('#event_date_start_1').val();
+             var event_date_end_1 = $('#event_date_end_1').val();
+            
+             $.ajax({ 
+                type: 'POST',
+                url: 'http://www.braggn.com/mobile_start_competition.php', 
+                data: {		                 
+                          task: 'start_competition',
+                          theme: theme,
+                          description: description,
+                          event_date_start_1: event_date_start_1,
+                          event_date_end_1: event_date_end_1                          
+                                                 
+                     },
+                  
+                success:function (data) {
+                    if(data == 1){
+                         jQuery("#comp_submit").html('Submit');
+                        alert('Your competition has been added successfully.');
+                    }else{
+                        alert(data);
+                        return false;
+                    }
+                  
+                },
+                 error: function (){
+                    alert('Your data could not be saved right now.Please try after some time.');
+                     return false;
+                 },
+            });
+        }
+            
+            $(document).ready(function() {
+            //Auto suggest friend
+                     $("#to_display").tokenInput("http://www.braggn.com/auto_suggest_friends.php", {theme: "facebook"});     
+                                        
+                         // show n hide friends text area	
+                     $(".comp_privacy").click(function(){ 					
+                      if($(this).val() == 1){
+                        $("#invite_friends_competitions").show();
+                     }else{
+                        $("#invite_friends_competitions").hide();
+                    }	
+                    });          
+          });
+        </script>
+     
+ </head>
+ <body>
+ 	<div class="ui right thin blue vertical demo sidebar menu">
+		
+		<a class="item" href="index.html">
+			Home
+		</a>
+		<a class="item" href="activity.html">
+			BraggN Page
+		</a>
+		<a class="active item" href="profile.html">
+			Profile
+		</a>
+		<a class="item" href="competition.html">
+			Competitions
+		</a>
+        <a class="item" href="friends.html">
+			Friends
+		</a>
+		<a class="item" href="notifications.html">
+			Notifications
+		</a>
+         
+		<a class="item" href="settings.html">
+			Settings
+		</a>     
+        <a class="item" onclick="logout();">
+			<span>Logout</span>
+		</a>
+		<div class="item">
+			<b>More</b>
+		<div class="menu">
+		  <a href="aboutus.html" class="item">About</a>
+		  <a href="contactus.html" class="item">Contact Us</a>
+		</div>
+		</div>
+	</div>
+	<div data-role="page" id="mainPage" style="z-index: 9999">
+		<div data-role="content">
+			<header>
+				<div id="social">
+					<ul>
+						<li class="icon-facebook" title="Facebook"><a href="https://www.facebook.com/pages/Braggncom/1392778994316222" target="_blank"></a></li>
+						<li class="icon-twitter" title="Twitter"><a href="https://twitter.com/braggncom" target="_blank"></a></li>
+						<li class="icon-vine" title="Vine"><a href="https://vine.co/braggn.com" target="_blank"></a></li>
+						<li class="icon-instagram" title="Instagram"><a href="http://instagram.com/braggncom" target="_blank"></a></li>	
+					</ul>
+				</div>
+				<a href="index.html"><img src="img/mobilebanner.png"></a>
+			</header>
+		</div>
+		<div id="content" class="rounded">
+            <a href="competition.html" id="back_ref" class="small ui button left floated column" style="float:right">
+				Back
+			</a>
+			<div class="page-title left floated column">
+				<h2 class="ui left floated column">Start Competition</h2>
+			</div>
+			
+			<div class="clearfix"></div>
+			<br/>
+			<div class="ui form">
+				<div class="field">
+					<div class="ui left input">
+                        <lable>Theme:</lable>
+                        <input type="text" maxlength="200" name="theme" id="theme"  value="" placeholder="e.g. Funniest Video" />						
+					</div>
+				</div>
+				<div class="field">
+					<div class="ui form">
+                        <label>Description:</label>
+                        <textarea name="description" id="description"  maxlength="200" placeholder="maximum 200 characters"></textarea>		
+					</div>
+				</div>
+				<div class="field">
+					<div class="se_event_calendar_container ui left input">
+                        <label>From:</label>
+						<input placeholder="From" type="date" name="event_date_start_1" id="event_date_start_1" value="" />
+					</div>
+				</div>
+				<div class="field">
+					<div class="ui right input">
+						<label>To:</label>
+                        <input placeholder="To" type="date" name="event_date_end_1" id="event_date_end_1" value="" />
+					</div>
+				</div>
+				<div class="field">
+					<div class="ui left input">
+						<input type='file' name='file1' id='file1' size='60' class='text'>
+					</div>
+				</div>               
+			           
+				<!--<div class="grouped inline fields">
+					<div class="field">					
+				            <input type="radio" name="comp_privacy" id="comp_privacy" align="absmiddle" class="comp_privacy" value="0" />
+							<label>Public (anyone join)</label>
+				   </div>					
+               
+					<div class="field">		                         
+							<input type="radio" name="comp_privacy" id="comp_privacy" align="absmiddle" class="comp_privacy" value="1" />
+							<label>Private (only invitees join)</label>						
+					</div>
+                 </div>    
+               <!-- <script type="text/javascript">
+               
+                // Auto suggest friends
+                $(document).ready(function() {
+                    $("#to_display").tokenInput("http://www.braggn.com/auto_suggest_friends.php", {theme: "facebook"});     
+                                        
+                         // show n hide friends text area	
+                     $(".comp_privacy").click(function(){ 					
+                      if($(this).val() == 1){
+                        $("#invite_friends_competitions").show();
+                     }else{
+                        $("#invite_friends_competitions").hide();
+                    }	
+                    });
+                    
+                    // Insert calendar dates
+                       // $('#event_date_start_1').datetimepicker(
+                       // {minDate: 0,addSliderAccess: true, 
+                           // sliderAccessArgs: { touchonly: true }});
+                       // $('#event_date_end_1').datetimepicker(
+                       // {minDate: 0,addSliderAccess: true, 
+                           // sliderAccessArgs: { touchonly: true }});
+                    
+                    // Check file extension and size
+                    
+                        document.getElementById('file1').addEventListener('change', checkFile, false);
+                        function checkFile(e) {			
+                            var arr_media = [ 'jpg', 'jpeg', 'gif', 'png', 'bmp', 'mp4', 'flv','mov','avi','mpa','swf','qt','mpeg', '3gp', 'wmv' ];			
+                                        
+                            var file_list = e.target.files;
+                            for (var i = 0, file; file = file_list[i]; i++) {
+                                var fileExtension = file.name.split('.')[file.name.split('.').length - 1].toLowerCase();
+                                                    
+                                if($.inArray(fileExtension, arr_media) == -1){	
+                                    $("#div_submit").hide();
+                                    $("#file_valid").show();
+                                    alert('File type is not supported.');										
+                                    return false;	
+                                }else if(file.size > (1024 * 1024*8)){
+                                    $("#div_submit").hide();
+                                    $("#file_valid").show();
+                                    alert('File size is exceeding the limit.');										
+                                    return false;
+                                }else{
+                                    $("#div_submit").show();
+                                    $("#fileValid").html('');
+                                    $("#file_valid").hide();					
+                                    return true;
+                                } 			
+                            }
+                        }					  	
+                
+                        });
+                     </script>-->       
+                
+   
+                    <div class="field" style='display:none' id="invite_friends_competitions">
+                        <div class="ui left input">
+                            <a href='javascript:void(0);' id="invite_friend_add">
+                                <img src='img/group_add48.gif' border='0' height="18px" width="18px"> Invite Friends:
+                            </a>
+                            <input type='text' name='to_display' id='to_display' placeholder="Invite Friends" value='' >
+                            
+                        </div>
+					</div>
+				</div>
+                  <input type='hidden' name='to_search' id='to_search' value="">
+			      <div class="ui blue submit button" id="comp_submit" onclick="start_competition();">Submit</div>
+			</div>
+         
+          
+		</div>
+	</div>
+	<footer class="rounded">
+		&copy; BraggN
+	</footer>  
+  
+ </body>
+ </body>
+ </html>

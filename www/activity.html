@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>Activity</title>
+	<link rel="stylesheet" href="css/mobile.css">
+	<link rel="stylesheet" href="css/semantic.css">	
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+     <style>
+        .modalDialog > div {
+            width: 236px;
+            height: 390px;
+            position: relative;
+            margin: 12% auto;
+            padding: 0px 38px 4px 0px;
+            border-radius: 8px;         
+        }
+    </style>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="js/bragg.js"></script>
+     <script src="js/general_function.js"></script>
+    
+    <script type="text/javascript"> 
+		var search_media = getUrlVars()["search"];
+         
+        $( document ).ready(function() { 
+                load_activity();                              
+          });        
+      
+        //show media details
+         function show_media(other_userid,owner_userid,media_id){           			
+			window.location='showactivity.html?back_url=activity.html&other_userid='+other_userid+'&owner_userid='+owner_userid+'&media_id='+media_id;
+             
+        }
+        
+        //Load more activity data
+        function load_more(page_id){
+            //Show ajax image before data loading
+            jQuery("#load_more").html("<img  src='img/ajax-loader3.gif' /> loading...");
+            load_activity(page_id);
+						
+		}
+        
+        function load_activity(page_id){
+            $.ajax({ 
+                    type: 'POST',
+                    url: 'http://www.braggn.com/mobile/mobile_activity.php',              
+                    dataType:'json',
+                    data: {					
+						p : page_id,
+						search : search_media
+					},
+                      
+                    success:function (response) {
+							
+                            var owner_user_id = response.owner_userid;
+							if(page_id){
+								jQuery("#load_more").html("Load More..."); 
+								//Show pagination link if any							
+								var page_number = page_id+2;								
+								if(page_number<=response.max_pages){
+									$('#pagination').show();
+									$('#load_more').attr("onclick","load_more("+page_number+")");
+								}else{
+									$('#pagination').hide();
+								}
+							}else{
+                             //Show pagination link if any
+								if(response.max_pages>1){                               
+									$('#pagination').show();
+									$('#load_more').attr("onclick","load_more(2)");							
+								}else{                              
+									$('#pagination').hide();
+								}
+                            }
+                           
+							for ( var index = 0; index < response.media_details.length; index++ ) {                                
+                            var mediaArray = response.media_details[ index ].split('^');
+                            var media_id = mediaArray[8];     
+                            var braggs_user_id =   mediaArray[9];
+                            var media_user_id =   mediaArray[10];    
+                            var bragg_class;
+                            var bragg_value;
+                            //aplied class for bragg and unbragg    
+                            if(braggs_user_id == owner_user_id){
+                                bragg_class = 'timeago';
+                                bragg_value = 'Unbragg';
+                            }else{
+                                bragg_class = 'description';
+                                bragg_value = 'bragg';
+                            }                                
+                            var play_arrow;
+							var comment_txt;
+							var bragg_txt;
+							//Show total number of braggs if any
+							if(mediaArray[6]>0 && mediaArray[6] != ''){
+								bragg_txt = mediaArray[6]+' bragg(s)';
+							}else{
+								bragg_txt = 'No braggs';
+							}
+							//Show total number of comments if any	
+							if(mediaArray[7]>0 && mediaArray[7] != ''){
+								comment_txt = mediaArray[7]+' comment(s)';
+							}else{
+								comment_txt = 'No comments';
+							}	
+                            //show video media    
+                            if(mediaArray[11] == 'mp4'){                             
+                              
+                                $('#media_details').append('<div class="image event" > <div class="label" id="user_avatar" onclick="other_user_profile('+mediaArray[10]+')"><img src="'+mediaArray[0]+'"></a></div><div class="content"> <div class="summary"> <a id="user_username" onclick="other_user_profile('+mediaArray[10]+');">'+mediaArray[1]+'</a></div> <div class="date" id="media_date">'+ mediaArray[2]+'</div> <div class="extra image"><a class="clearfix feed-title" id="media_title">'+mediaArray[3]+'</a> <a href="javascript:void(0);"  title="Caption" onclick="show_media('+mediaArray[10]+','+owner_user_id+','+mediaArray[8]+');"><img src="'+mediaArray[4]+'" id="media_image" height="200" width="200"></a><small class="clearfix" id="media_description">'+mediaArray[5]+'</small></div> <div class="ui green feed-count"><span class="'+ bragg_class+'" name="braggs" id="media_'+media_id +'" onclick="update_bragg('+media_id+');" >Bragg / </span><a id="total_braggs_'+media_id+'">'+bragg_txt+' / </a><a>'+comment_txt+'</a> <input type="hidden"  id="bragg_value_'+media_id+'" value="'+bragg_value+'"/ ></div> </div> </div>');
+                            
+                            }else{  //show image media
+                                
+							   $('#media_details').append('<div class="image event" > <div class="label" id="user_avatar" onclick="other_user_profile('+mediaArray[10]+')"><img src="'+mediaArray[0]+'"></a></div><div class="content"> <div class="summary"> <a id="user_username" onclick="other_user_profile('+mediaArray[10]+');">'+mediaArray[1]+'</a></div> <div class="date" id="media_date">'+ mediaArray[2]+'</div> <div class="extra image"><a class="clearfix feed-title" id="media_title">'+mediaArray[3]+'</a> <a href="javascript:void(0);"  title="Caption" onclick="show_media('+mediaArray[10]+','+owner_user_id+','+mediaArray[8]+');"><img src="'+mediaArray[4]+'" id="media_image"></a><small class="clearfix" id="media_description">'+mediaArray[5]+'</small></div> <div class="ui green feed-count"><span class="'+ bragg_class+'" name="braggs" id="media_'+media_id +'" onclick="update_bragg('+media_id+');" >Bragg / </span><a id="total_braggs_'+media_id+'">'+bragg_txt+' / </a><a>'+comment_txt+'</a> <input type="hidden"  id="bragg_value_'+media_id+'" value="'+bragg_value+'"/ ></div> </div> </div>');
+                                
+				        }
+                    }
+                                            },
+                     error: function (){
+                       window.location= "index.html";
+                        return false;
+                     }
+                });
+        }
+		
+		function upload_iframe(){           
+            var leaderboard_url = 'leaderboard.html';
+            $('#leaderboard_iframe').attr('src', leaderboard_url);
+        }
+        
+        function go_leaderboard(){
+            window.location='activity.html';
+        }
+		function activity_search(){
+			var searchmedia = $('#search').val();
+			window.location= "activity.html?search="+searchmedia;
+		}
+       
+        </script>
+ </head>
+ <body>
+	<div class="ui right thin blue vertical demo sidebar menu">
+		
+		<a class="item" href="index.html">
+			Home
+		</a>
+		<a class="active item" href="activity.html">
+			BraggN Page
+		</a>
+		<a class="item" href="profile.html">
+			Profile
+		</a>
+		<a class="item" href="competition.html">
+			Competitions
+		</a>
+        <a class="item" href="friends.html">
+			Friends
+		</a>
+		<a class="item" href="notifications.html">
+			Notifications
+		</a>
+          
+		<a class="item" href="settings.html">
+			Settings
+		</a>     
+        <a class="item" onclick="logout();">
+			<span>Logout</span>
+		</a>
+		<div class="item">
+			<b>More</b>
+		<div class="menu">
+		  <a href="aboutus.html" class="item">About</a>
+		  <a href="contactus.html" class="item">Contact Us</a>
+		</div>
+		<div class="menu">				
+			<input type="text" name="search" id="search" value="" size="14px" style="margin-left:20px">
+			<br><br><div class="floated tiny ui button" style="margin-left:20px"><a id="activity_search" name="activity_search" onclick="activity_search();">Search Media</a></div>
+		</div>	
+		</div>
+	</div>
+	<div data-role="page" id="mainPage" style="z-index: 9999">
+		<div data-role="content">
+			<header>
+            	<div id="social">
+					<ul>
+						<li><a href="https://www.facebook.com/pages/Braggncom/1392778994316222" target="_blank"><img src="img/fb.png"></a></li>
+                        <li><a href="https://twitter.com/braggncom" target="_blank"><img src="img/tw.png"></a></li>
+                        <li><a href="https://vine.co/braggn.com" target="_blank"><img src="img/vine-16.png"></a></li>
+                        <li><a href="http://instagram.com/braggncom" target="_blank"><img src="img/Instagram-16.png"></a></li>
+                        <li><a  href="https://plus.google.com/100216016506071395783" rel="publisher" target="_blank"><img src="img/google_circle-16.png"></a></li>
+					</ul>
+				</div>
+				<a href="index.html"><img src="img/BraggN_banner_animated.gif"></a>				
+			 </header>
+			<div id="intro_video">
+				<a href="http://www.braggn.com/include/BraggN-Intro-Animation-2A_sound.mp4" class="html5lightbox" data-width="400" data-height="250" title="LEARN ABOUT BRAGGN">
+					<img src="img/youtube.png">
+				</a>
+			</div>
+		 </div>		
+		<div id="content" class="rounded">
+			<div class="page-title left floated column">
+				<h2 class="ui left floated column">BraggN Page</h2>
+			</div>
+			
+			<div class="small ui green button icon toggle button right floated column" data-variation=".right">
+				<i class="reorder icon"></i>
+			</div>
+			<div class="ui feed" id="media_details">		
+			</div>
+            <div id="pagination" style="display:none" class="small ui center aligned borderless pagination menu">
+			     <a class="item tiny ui button" id="load_more">Load More..</a>
+            </div>
+			
+		</div>
+	</div>
+	<footer class="rounded">
+		&copy; BraggN
+	</footer>
+
+	<script src="js/semantic.min.js"></script>
+	<script type="text/javascript">
+		$('.demo.sidebar').first()
+		  .sidebar('attach events', '.toggle.button')
+		;
+	</script>
+ </body>
+ </html>

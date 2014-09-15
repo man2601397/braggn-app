@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>BraggN</title>
+	<link rel="stylesheet" href="css/mobile.css">
+	<link rel="stylesheet" href="css/semantic.css">	
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700' rel='stylesheet' type='text/css'>     
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bragg.js"></script>
+    <script type="text/javascript" src="js/general_function.js"></script>
+    <script type="text/javascript">
+            
+           var other_userid = getUrlVars()["user_id"];
+		   var search_media = getUrlVars()["search"];
+            
+            var owner_userid;
+            var user_userid;
+		            
+            $( document ).ready(function() {   
+                $.ajax({ 
+                    type: 'POST',
+                    url: 'http://www.braggn.com/mobile/mobile_profile.php',              
+                    dataType:'json',
+                    data: {
+						other_user_id : other_userid,
+						search : search_media
+					},
+                      
+                    success:function (response) {
+						if(response == 'user not exists'){
+							alert('You must be looged in.');
+							return false;
+						}
+                        $('#user_name').html(response.user_username);
+                        $('#user_avatar').attr('src', response.user_profile_photo);
+                        $('#user_description').html(response.user_userdescription);
+                        if(response.profile_private == 1){                            
+                            $('#data_divider').hide();                           
+                            $('#send_request').attr('onclick',  "confirm_request(\'"+response.user_username+"\');");                
+                            $('#private_profile').show();                        
+                            return false;
+                        }else if(response.sent_reuqest == 1){
+                            $('#data_divider').hide();
+                            $('#private_profile').show();                                                                    
+                            $('#private_profile').html("<div class='ui info message'><em class='left floated'>"+response.user_username+" has decided to keep their profile private and you already have sent them friend request.</em></div><div class='ini ui button' onclick='cancel_request(\""+response.user_username+"\")';>Cancel Request</div>");
+                            return false;                            
+                        }else{                            
+                            owner_userid = response.owner_userid;
+                            user_userid = response.userid; 
+                            // Store userid in localstorage for further usage 
+                            window.localStorage.setItem("session_userid", owner_userid);
+                                                 
+                            //show follower
+                            if(response.follower_count>0){
+                                $('#user_followers').show();
+                            }
+                            if(response.following_count>0){
+                                $('#user_following').show();
+                            }
+                            //show owner details                    
+                            $('#userid').val(response.userid);
+                            $('#user_name').html(response.user_username);
+                            $('#user_avatar').attr('src', response.user_profile_photo);
+                            $('#user_description').html(response.user_userdescription);
+                            $('#user_followers').html(response.follower_count+' Followers');
+                            $('#user_following').html(response.following_count+' following');
+                            
+                            //SHOW N HIDE NUMBER OF POST IF POST EXISTS
+                            if(response.posts_count>0){
+                                $('#number_post').html(response.posts_count+ ' posts');                               
+                            }else{
+                                $('#number_post').html('No posts');                               
+                            }
+                            
+                            //Show pagination link if any
+				            if(response.max_pages>1){                               
+								$('#pagination').show();
+								$('#load_more').attr("onclick","load_more(2)");							
+                            }else{                              
+                                $('#pagination').hide();
+                            }
+                            
+                            //show upload button if owner only 
+                             if(owner_userid == user_userid){
+                                $('#upload_btn').show();
+                             }
+                            
+                            //show follow button for non-owner users
+                            var follow;
+                            var hidden_val;
+                            if(owner_userid != user_userid){
+                                if(response.Follow != 1){
+                                    follow = 'Follow Me';
+                                    hidden_val = 'follow';
+                                }else{
+                                    follow = 'Following';
+                                    hidden_val = 'followed';
+                                }
+                                $('#user_follow').show();
+                                $('#user_follow').append('<div id="follow_'+user_userid+'"><span class="btn_follower" id="follow_user_'+user_userid+'" style="color:black;" onclick="follow_me();">'+follow+'</span><input type="hidden" id="followed_user" value="'+hidden_val+'"/></div>');
+                                
+                            }
+                            
+                            // Display user post data
+                           
+							for ( var index = 0; index < response.media_id.length; index++ ) {
+				            var mediaArray = response.media_id[ index ].split('_');
+                            //show bragg star
+                            var star_icon;
+                            if(mediaArray[3]>=25 && mediaArray[3]<50){
+                               star_icon = "<i class='star icon green'></i>"; 
+                            }else if(mediaArray[3]>=50 && mediaArray[3]<75){
+                                star_icon = "<i class='star icon purple'></i>";
+                            }else if(mediaArray[3]>=75 && mediaArray[3]<100){
+                                star_icon = "<i class='star icon orange'></i>";
+                            }else if(mediaArray[3]>=100 && mediaArray[3]<150){
+                                star_icon = "<i class='star icon red'></i>";
+                            }else if(mediaArray[3]>=150 && mediaArray[3]<200){
+                                star_icon = "<i class='star icon blue'></i>";
+                            }else if(mediaArray[3]>=200){
+                                star_icon = "<i class='star icon yellow'></i>";
+                            }else{
+								star_icon = "";
+							}
+
+								 var image_path = "http://www.braggn.com/uploads_user/1000/"+mediaArray[2]+"/"+mediaArray[0]+"_thumb.jpg";
+								 var media_dir = "http://www.braggn.com/uploads_user/1000/"+mediaArray[2]+"/"+mediaArray[0]+"."+mediaArray[1];
+                                if(mediaArray[1] == 'mp4'){                                   
+                                    $('#post_data').append('<div class="item"><div class="image"><a href="javascript:void(0);" onclick="show_media('+user_userid+','+owner_userid+','+mediaArray[0]+');"><img src="'+image_path+'"></a> <a class="facetime video ui corner label"> <i class="facetime video icon"></i></a></div><div class="content"> <div class="name">'+mediaArray[5]+'</div>'+star_icon+' <small class="text-muted">'+ mediaArray[3]+' bragg(s) </small></div></div>');
+                                }else{                                
+								$('#post_data').append('<div class="item"><div class="image"><a href="javascript:void(0);" onclick="show_media('+user_userid+','+owner_userid+','+mediaArray[0]+');"><img src="'+image_path+'"></a> <a class="camera ui corner label"> <i class="camera icon"></i></a> </div><div class="content"> <div class="name">'+mediaArray[5]+'</div>'+star_icon+' <small class="text-muted">'+ mediaArray[3]+' bragg(s) </small></div></div>');
+							 }
+                            }
+                       }
+                                                                      
+                    },
+                    error: function (){
+                        window.location= "index.html";
+                        return false;
+                     }
+                });
+                    
+          });
+		
+    
+    //show media details
+     function show_media(other_userid,owner_userid,media_id){           			
+			window.location='showactivity.html?back_url=profile.html&other_userid='+other_userid+'&owner_userid='+owner_userid+'&media_id='+media_id;
+             
+        }
+         
+     //for follow me button
+    function follow_me(){			
+			
+			var user_id = $('.btn_follower').attr('id');		
+			var array = user_id.split('_');
+			var userid = array[2];
+			var flag_follow = $("#followed_user").val();        
+			
+			 $.ajax({
+			   type: 'POST',
+			   url: 'http://www.braggn.com/mobile/mobile_follow_user.php',
+              
+			   data: {				
+				 following_user_id: userid,
+                 follower_user_id: owner_userid,  
+				 flag: flag_follow
+				},
+                 
+			   success: function(result) {                  
+				
+				if(result == 1){
+					$("#followed_user").attr('value','followed');
+					$('#follow_user_'+userid)
+					.html("Following");
+				}else{
+					$("#followed_user").attr('value','follow');
+					$('#follow_user_'+userid)
+					.html("Follow Me");
+				}
+				
+			  },
+             error:function(){
+                alert('Some error occured: Please try later.');       
+             },
+				
+			});
+		}
+        
+        function clear_iframe(){           
+            window.location='profile.html';
+        }
+        
+        function upload_iframe(){
+            $('#upload_frame').attr('src', 'http://www.braggn.com/mobile_upload_user.php');            
+        }
+        function go_profile(){
+            window.location='profile.html';
+        }
+        
+        //Load more data
+        function load_more(page_id){
+            //Show ajax image before data loading
+            jQuery("#load_more").html("<img  src='img/ajax-loader3.gif' /> loading...");
+			$.ajax({ 
+                    type: 'POST',
+                    url: 'http://www.braggn.com/mobile/mobile_profile.php',              
+                    dataType:'json',
+                    data: {
+						other_user_id : other_userid,
+						p : page_id
+					},
+                      
+                    success:function (response) {
+                            //Hide ajax image and show buttin again
+                            jQuery("#load_more").html("Load More..."); 
+							//Show pagination link if any							
+				            var page_number = page_id+1; //add 1 to current page number for next page link								
+				            if(page_number<=response.max_pages){
+                                $('#pagination').show();
+                                $('#load_more').attr("onclick","load_more("+page_number+")");
+                            }else{
+                                $('#pagination').hide();
+                            }                                            
+                            
+                            // Append user post data                           
+							for ( var index = 0; index < response.media_id.length; index++ ) {
+				            var mediaArray = response.media_id[ index ].split('_');
+                            //show bragg star
+                            var star_icon;
+                            if(mediaArray[3]>=25 && mediaArray[3]<50){
+                               star_icon = "<i class='star icon green'></i>"; 
+                            }else if(mediaArray[3]>=50 && mediaArray[3]<75){
+                                star_icon = "<i class='star icon purple'></i>";
+                            }else if(mediaArray[3]>=75 && mediaArray[3]<100){
+                                star_icon = "<i class='star icon orange'></i>";
+                            }else if(mediaArray[3]>=100 && mediaArray[3]<150){
+                                star_icon = "<i class='star icon red'></i>";
+                            }else if(mediaArray[3]>=150 && mediaArray[3]<200){
+                                star_icon = "<i class='star icon blue'></i>";
+                            }else if(mediaArray[3]>=200){
+                                star_icon = "<i class='star icon yellow'></i>";
+                            }else{
+								star_icon = "";
+							}
+
+								 var image_path = "http://www.braggn.com/uploads_user/1000/"+mediaArray[2]+"/"+mediaArray[0]+"_thumb.jpg";
+								 var media_dir = "http://www.braggn.com/uploads_user/1000/"+mediaArray[2]+"/"+mediaArray[0]+"."+mediaArray[1];
+                                if(mediaArray[1] == 'mp4'){                                   
+                                    $('#post_data').append('<div class="item"><div class="image"><a href="javascript:void(0);"  onclick="show_media('+user_userid+','+owner_userid+','+mediaArray[0]+');"><img src="'+image_path+'"></a> <a class="facetime video ui corner label"> <i class="facetime video icon"></i></a></div><div class="content"> <div class="name">'+mediaArray[5]+'</div>'+star_icon+' <small class="text-muted">'+ mediaArray[3]+' bragg(s) </small></div></div>');
+                                }else{                                
+								$('#post_data').append('<div class="item"><div class="image"><a href="javascript:void(0);" onclick="show_media('+user_userid+','+owner_userid+','+mediaArray[0]+');"><img src="'+image_path+'"></a> <a class="camera ui corner label"> <i class="camera icon"></i></a> </div><div class="content"> <div class="name">'+mediaArray[5]+'</div>'+star_icon+' <small class="text-muted">'+ mediaArray[3]+' bragg(s) </small></div></div>');
+							 }
+                            }                                                                                             
+                    },
+                    error: function (){
+                        window.location= "index.html";
+                        return false;
+                     }
+                });
+			
+			}
+		function open_locker(){
+			
+            var locker_url = 'http://www.braggn.com/mobile/mobile_braggn_locker.php';
+            $('#upload_frame').attr('src', locker_url);
+			$('#upload_frame').attr('style', 'height:422px;width:226px;');
+			$('#upload_frame').attr('scrolling', 'no');
+			$('#openModal').attr('class', 'braggn_locker');
+		}
+		function profile_search(){
+			var searchmedia = $('#search').val();
+			window.location= "profile.html?search="+searchmedia;
+		}
+        function list_follow(followtag){
+			window.location= "follower_details.html?followtag="+followtag;			
+		}
+		
+        </script>
+ </head>
+ <body>
+	<div class="ui right thin blue vertical demo sidebar menu">
+				
+		<a class="item" href="index.html">
+			Home
+		</a>
+		<a class="item" href="activity.html">
+			BraggN Page
+		</a>
+		<a class="active item" href="profile.html">
+			Profile
+		</a>
+		<a class="item" href="competition.html">
+			Competitions
+		</a>
+         <a class="item" href="friends.html">
+			Friends
+		</a>
+		<a class="item" href="notifications.html">
+			Notifications
+		</a>      
+		<a class="item" href="settings.html">
+			Settings
+		</a>     
+        <a class="item" onclick="logout();">
+			<span>Logout</span>
+		</a>
+		<div class="item">
+			<b>More</b>
+			<div class="menu">
+			  <a href="aboutus.html" class="item">About</a>
+			  <a href="contactus.html" class="item">Contact Us</a>
+			</div>
+			<div class="menu">				
+				<input type="text" name="search" id="search" value="" size="14px" style="margin-left:20px">
+				<br><br><div class="floated tiny ui button" style="margin-left:20px"><a id="profile_search" name="profile_search" onclick="profile_search();">Search Media</a></div>
+			</div>
+		</div>
+	</div>
+	<div data-role="page" id="mainPage" style="z-index: 9999">
+		<div data-role="content">
+			<header>
+            	<div id="social">
+					<ul>
+						<li><a href="https://www.facebook.com/pages/Braggncom/1392778994316222" target="_blank"><img src="img/fb.png"></a></li>
+                        <li><a href="https://twitter.com/braggncom" target="_blank"><img src="img/tw.png"></a></li>
+                        <li><a href="https://vine.co/braggn.com" target="_blank"><img src="img/vine-16.png"></a></li>
+                        <li><a href="http://instagram.com/braggncom" target="_blank"><img src="img/Instagram-16.png"></a></li>
+                        <li><a  href="https://plus.google.com/100216016506071395783" rel="publisher" target="_blank"><img src="img/google_circle-16.png"></a></li>
+					</ul>
+				</div>
+				<a href="index.html"><img src="img/BraggN_banner_animated.gif"></a>				
+			 </header>
+			<div id="intro_video">
+				<a href="http://www.braggn.com/include/BraggN-Intro-Animation-2A_sound.mp4" class="html5lightbox" data-width="400" data-height="250" title="LEARN ABOUT BRAGGN">
+					<img src="img/youtube.png">
+				</a>
+			</div>
+		 </div>	
+		<div id="content" class="rounded">            
+			<div class="page-title left floated column">
+				<h2 class="ui left floated column">Profile</h2>
+			</div>
+			<div class="small ui green button icon toggle button right floated column" data-variation=".right">
+				<i class="reorder icon"></i>
+			</div>
+			<div class="ui feed">
+				<div class="event">
+					<img class="ui small circular left floated image" id="user_avatar" src="">					
+				</div>
+				<div>
+					<a id="user_name"></a><br>
+					<span class="text-muted" id="user_description"></span><br>
+				</div><br>
+				<div class="lockerLogin">
+					<div class="ui left floated buttons">
+					  <a onclick="list_follow('followers');"> <span class="mini ui button" id="user_followers" style="display:none"></span></a><br>
+					  <a onclick="list_follow('following');"> <span class="mini ui button" id="user_following" style="display:none"></span></a>
+					</div>
+					<div class="mini ui green right floated button" id="user_follow" style="display:none"></div>
+				</div>
+			</div>
+			<div>
+				<a id="lockers" href="#openModal" class="locker" onclick="open_locker();"> </a>				
+            </div>
+            <div class="clearfix" id="private_profile" style="display:none">
+				<div class="ui info message">
+				    <em class="left floated">This user has decided to keep their profile private. Click <a id="send_request" onclick="">here</a> to send them a request if you would like to be friends.</em>
+				</div>
+			</div>
+			<div class="ui segment divider" id="data_divider"></div>
+			<span class="text-muted" id="number_post"></span>
+            <div id="upload_btn" class="right floated tiny ui button" style="display:none"><a href="#openModal" onclick="upload_iframe();">Upload</a></div>
+			<div class="ui two items" id="post_data">			
+			</div>
+			<div id="pagination" style="display:none" class="small ui center aligned borderless pagination menu">
+			     <a class="item tiny ui button" id="load_more">Load More..</a>
+             </div>
+			<div class="ui divider"></div>
+			<div id="badges">
+				<i class="star icon green"></i> <small class="text-muted">25 braggs</small>
+				<i class="star icon purple"></i> <small class="text-muted">50 braggs</small>
+				<i class="star icon orange"></i> <small class="text-muted">75 braggs</small>
+				<i class="star icon red"></i> <small class="text-muted">100 braggs</small>
+				<i class="star icon blue"></i> <small class="text-muted">150 braggs</small>
+				<i class="star icon yellow"></i> <small class="text-muted">200 braggs</small>
+				<i class="smile icon green"></i> <small class="text-muted">200 followers</small>
+				<i class="smile icon purple"></i> <small class="text-muted">300 followers</small>
+				<i class="smile icon yellow"></i> <small class="text-muted">500 followers</small>
+			</div>
+		</div>
+	 <input type="hidden" name="userid" id="userid" value="" />
+      <div id="openModal" class="modalDialog_profile">
+        <div>
+            <a title="Close" class="close" onclick="clear_iframe();">X</a>
+            <iframe id="upload_frame" src="" style="height:461px;width:284px;"></iframe>
+        </div>
+     </div>    
+     </div>
+    
+	<footer class="rounded">
+		&copy; BraggN
+	</footer>	
+
+	<script src="js/semantic.min.js"></script>
+	<script type="text/javascript">
+		$('.demo.sidebar').first()
+		  .sidebar('attach events', '.toggle.button')
+		;
+	</script>
+ </body>
+ </html>

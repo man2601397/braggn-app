@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>BraggN</title>
+	<link rel="stylesheet" href="css/mobile.css">
+	<link rel="stylesheet" href="css/semantic.css">
+	<link rel="stylesheet" href="css/swipebox.min.css">
+	<link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/font-awesome.css">
+	 <style>
+        .modalDialog > div {
+            width: 236px;
+            height: 214px;
+            position: relative;
+            margin: 12% auto;
+            padding: 0px 38px 4px 0px;
+            border-radius: 8px;         
+        }
+    </style>  
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700' rel='stylesheet' type='text/css'>     
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="js/bragg.js"></script>
+    <script src="js/general_function.js"></script>
+     <script type="text/javascript">           
+			        
+            $( document ).ready(function() {   
+                $.ajax({ 
+                    type: 'POST',
+                    url: 'http://www.braggn.com/mobile/comp_leaderboard.php',              
+                    dataType:'json',                    
+                      
+                    success:function (response) {
+						
+						if(response != ''){                           
+							  $('#data_comp_leaderboard').show();	
+                              $.each(response, function(i, item) {                                   
+									var media_dir = "http://www.braggn.com/uploads_user/1000/"+response[i].user_id+"/"+response.media_id+"."+response.media_ext;
+									var media_thumb = "http://www.braggn.com/uploads_user/1000/"+response[i].user_id+"/"+response[i].media_id+"_thumb.jpg";
+									$('#data_comp_leaderboard').append('<div id="top_leader_video"><img src="'+media_thumb+'" width="140" height="150" border="0"></a><p><span class="blue">Competition: </span>'+ response[i].comp_title+'<br><span class="blue">Uploaded by: </span>'+ response[i].user_username+'<br><span class="blue">Braggs: </span>'+ response[i].total_braggs +'<br><span class="blue">Rank: </span>'+'#'+ response[i].rank +'</p> </div>');						
+									
+                                });                                
+                            }else{
+								$('#data_comp_leaderboard').html("No leaderboard available.");
+							}							
+						},                                                                  
+                    
+                    error: function (){
+                        window.location= "index.html";
+                        return false;
+                     }
+                });
+                    
+          });   
+
+      </script>
+ </head>
+ <body>	
+	<div data-role="page" id="mainPage" style="z-index: 9999">		
+		<div id="content" class="rounded">            
+			<div class="page-title left floated column">
+				 <span style="color: #0099cb;font-weight:bold;font-size:15px;font-family:Open Sans,sans-serif">Competition Leaderboard</span>				
+			</div>        
+		
+			<div class="ui items" id="data_comp_leaderboard" style="display:none">					
+		   </div>		
+       </div>
+	 </div>
+ </body>
+ </html>

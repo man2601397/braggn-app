@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>BraggN</title>
+	<link rel="stylesheet" href="css/mobile.css">
+	<link rel="stylesheet" href="css/semantic.css">	
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>	
+    <script src="js/bragg.js"></script>
+    <script src="js/general_function.js"></script>
+	<script type="text/javascript">
+			var returnurl;			
+            var owner_username;
+			var video_path;
+			var video_poster;
+			if(getUrlVars()["return_url"]){
+				returnurl = getUrlVars()["return_url"];
+				
+			}
+            $( document ).ready(function() {   
+                $.ajax({ 
+                    type: 'POST',
+                    url: 'http://www.braggn.com/mobile/mobile_competition.php',              
+                    dataType:'json',
+                    data: {
+						//other_user_id : other_userid
+					},
+                      
+                    success:function (response) {
+                        owner_username = response.owner_username;
+						video_path   = response.video_month_dir;
+						video_poster = response.video_month_path;
+                        //add start competition link
+                        //$('#start_competition').attr('href', "http://www.braggn.com/mobile_startcompetition/"+owner_username);
+                        
+                        // show owner details    
+                        $('#owner_username').html(owner_username);
+                        $('#owner_description').html(response.owner_description);
+                        $('#owner_profile_pic').attr('src', response.owner_profile_photopath);
+                        
+                        //show monthly competition data
+						$('#photo_month_path').attr('src', response.photo_month_path);
+                        $('#image_month').attr('href',response.photo_month_dir);
+						$('#video_month_path').attr('src', response.video_month_path);						
+						
+                        //show running competition details id any
+                        if(response.competition_info){
+                          $.each(response.competition_info, function(i, item) {							
+								 $('#competition_info').append(' <div class="item"><div class="right floated tiny ui button" id="viewentries_'+response.competition_info[i].comp_id+'" onclick="view_entries('+response.competition_info[i].comp_id+');">View Entries</div><img class="ui avatar image" src="'+response.competition_info[i].comp_media_path+'"><div class="content">  <div class="header">'+response.competition_info[i].comp_title+'</div></div></div><div id="show_entries_'+response.competition_info[i].comp_id+'" style="display:none;"><span id="see_username_'+response.competition_info[i].comp_id+'" style="display:none;">(Click on username to see their entries)</span><div class="ui two items" id="view_entries_'+response.competition_info[i].comp_id+'"></div></div>');
+                            });                          
+                        }else{ //if not any competition is running
+                             $('#competition_info').html('No competition running currently.<div class="ui divider"></div>');                            
+                        }			  
+                        
+                    //show competition entered information if any    
+					  if(response.competition_entered_info != ''){
+                          $.each(response.competition_entered_info, function(i, item) {							
+								 $('#comp_entered').append(' <div class="item"><div class="right floated tiny ui button" onclick="show_media('+response.competition_entered_info[i].media_id+','+response.competition_entered_info[i].rank+')">View Entry</div><img class="ui avatar image" src="'+response.competition_entered_info[i].comp_entered_media_path+'"><div class="content">  <div class="header">'+response.competition_entered_info[i].comp_title+'</div></div> </div>');
+                            });                          
+                        }else{ //if not enetered into any competition
+                             $('#comp_entered').html('No competition you have entered into.<div class="ui divider"></div>');                            
+                        }
+			  
+                    },
+                     error: function (){
+                        window.location= "index.html";
+                        return false;
+                     }
+                }); 
+			//Open start competition modal window if user comes from index page	
+   			if(returnurl == 'startcompetition'){
+					window.location= "competition.html?return_url=startcompetition#openModal";
+					start_comp();										
+				}
+                    
+          });
+        
+   //show all details of who joined the competition
+    function view_entries(comp_id){
+		 $('#view_entries_'+comp_id).empty();
+		 $('#see_username_'+comp_id).hide();
+         jQuery('#viewentries_'+comp_id).html("<img  src='http://www.braggn.com/mobile/img/ajax-loader3.gif' /> loading...");	
+		 
+         $.ajax({ 
+                    type: 'POST',
+                    url: 'http://www.braggn.com/mobile/mobile_comp_entered_users.php',              
+                    dataType:'json',
+                    data: {
+						comid : comp_id
+					},
+                      
+                    success:function (response) { 	                
+                            
+                          if(response.competition_entered_users){
+							  jQuery('#viewentries_'+comp_id).html('View Entries');
+							  $.each(response.competition_entered_users, function(i, item) {
+								if(response.competition_entered_users[i].user_info.comp_privacy == '1' && response.competition_entered_users[i].user_info.is_invited == '0' && response.competition_entered_users[i].user_info.owner_user_id != response.competition_entered_users[i].user_info.comp_user_id){
+									alert("This competition is private and you are not authorize to view. ");
+									return false;								
+								}								
+								$('#show_entries_'+comp_id).show();
+								$('#see_username_'+comp_id).show();
+									
+								$('#view_entries_'+comp_id).append(' <div class="item" style="min-height:0px" id="view_comp_username"><a onclick="show_media('+response.competition_entered_users[i].user_info.media_id+','+response.competition_entered_users[i].user_info.rank+');">'+response.competition_entered_users[i].user_info.user_username+'</a>');
+							});                          
+                        }  	  
+                    },
+                     error: function (){
+                        window.location= "index.html";
+                        return false;
+                     }
+                });
+         
+    }        
+     
+    //show media details     
+     function show_media(media_id,media_rank){             
+           			
+			window.location='showactivity.html?back_url=competition.html&media_rank='+media_rank+'&media_id='+media_id;
+             
+        }
+        
+         
+      function clear_iframe(){
+            $('#upload_frame').attr('src', '');
+            window.location='competition.html';
+        }
+     function upload_video(){
+            $('#upload_frame').attr('src', 'http://www.braggn.com/mobile_upload_user.php?upload_type=video');            
+        }
+     function upload_image(){
+            $('#upload_frame').attr('src', 'http://www.braggn.com/mobile_upload_user.php?upload_type=image');            
+        }
+	function start_comp(){
+		 $('#modal_div').css({"width":"268px","height":"516px","font-size": "0.5rem"});
+		 $('#upload_frame').attr('style','height:514px;width:304px;');
+		 $('#upload_frame').attr('src', 'http://www.braggn.com/mobile/mobile_startcompetition/'+owner_username);
+	}
+	function showvideo(){	
+		$('#modal_video').css({"width":"236px","height": "214px","position": "relative","margin": "12% auto","padding":"0px 38px 4px 0px","border-radius":"8px"});
+		var video_url = 'http://www.braggn.com/mobile_play_video.php?video_path='+video_path+'&video_poster='+video_poster;
+		$('#video_iframe').attr('src', video_url);
+	 }
+	function go_competition(){
+       window.location='competition.html';
+     }
+	
+	function upload_iframe(){
+			alert('leaderboard');
+            var leaderboard_url = 'leaderboard.html';
+            $('#upload_frame').attr('src', leaderboard_url);
+        }
+        
+       	
+    </script>
+ </head>
+ <body>
+    
+	 <div class="ui right thin blue vertical demo sidebar menu">
+		
+		<a class="item" href="index.html">
+			Home
+		</a>
+		<a class="item" href="activity.html">
+			BraggN Page
+		</a>
+		<a class="item" href="profile.html">
+			Profile
+		</a>
+		<a class="active item" href="competition.html">
+			Competitions
+		</a>
+        <a class="item" href="friends.html">
+			Friends
+		</a>
+		<a class="item" href="notifications.html">
+			Notifications
+		</a>
+         
+		<a class="item" href="settings.html">
+			Settings
+		</a>     
+        <a class="item" onclick="logout();">
+			<span>Logout</span>
+		</a>
+		<div class="item">
+			<b>More</b>
+		<div class="menu">
+		  <a href="aboutus.html" class="item">About</a>
+		  <a href="contactus.html" class="item">Contact Us</a>
+		</div>
+		</div>
+	</div>
+	<div data-role="page" id="mainPage" style="z-index: 9999">
+		<div data-role="content">
+			<header>
+            	<div id="social">
+					<ul>
+						<li><a href="https://www.facebook.com/pages/Braggncom/1392778994316222" target="_blank"><img src="img/fb.png"></a></li>
+                        <li><a href="https://twitter.com/braggncom" target="_blank"><img src="img/tw.png"></a></li>
+                        <li><a href="https://vine.co/braggn.com" target="_blank"><img src="img/vine-16.png"></a></li>
+                        <li><a href="http://instagram.com/braggncom" target="_blank"><img src="img/Instagram-16.png"></a></li>
+                        <li><a  href="https://plus.google.com/100216016506071395783" rel="publisher" target="_blank"><img src="img/google_circle-16.png"></a></li>
+					</ul>
+				</div>
+				<a href="index.html"><img src="img/BraggN_banner_animated.gif"></a>				
+			 </header>
+			<div id="intro_video">
+				<a href="http://www.braggn.com/include/BraggN-Intro-Animation-2A_sound.mp4" class="html5lightbox" data-width="400" data-height="250" title="LEARN ABOUT BRAGGN">
+					<img src="img/youtube.png">
+				</a>
+			</div>
+		 </div>	
+		<div id="content" class="rounded">
+			<div class="page-title left floated column">
+				<h2 class="ui left floated column">Competitions</h2>
+			</div>
+			<div class="small ui green button icon toggle button right floated column" data-variation=".right">
+				<i class="reorder icon"></i>
+			</div>
+			<div class="ui feed">
+				<div class="event">
+					<img class="ui small circular left floated image" src="" id="owner_profile_pic">
+					<a class="profile-user" id="owner_username"></a>
+					<span class="text-muted" id="owner_description"></span>
+				</div>
+			</div>
+            <span class="text-muted"  style="color:#0099CB">Competitions Running</span>
+			<div id="pagination upload_btn" class="ui center aligned tiny ui button menu leaderBoard" align="center">
+				<a onclick="upload_iframe();" href="#openModal">Leaderboard</a>
+			</div>
+			<div class="ui divided list" id="competition_info">							
+			</div>
+			<div class="ui two items">
+			  <div class="item" id="photo_month">
+			    <div class="name">Photo of the Month (Till Today)</div><br/>
+			    <div class="image">
+			      <a class="swipebox" href="" id="image_month"><img id="photo_month_path" src=""></a>
+			      <a class="camera ui corner label">
+			        <i class="camera icon"></i>
+			      </a>
+                <a href="#openModal" class="fluid small ui button" onclick="upload_image();">Join</a>     
+                <!--<a onclick="window.open('http://www.braggn.com/mobile_upload_user.php?upload_type=image', '_system');" class="fluid small ui button">Join</a>-->
+			    </div>
+			  </div>
+			  <div class="item" id="video_month">
+			    <div class="name">Video of the Month (Till Today)</div><br/>
+			    <div class="image">
+				  <a href="#openModal_video" onclick="showvideo();">
+                   <img id="video_month_path" src="">					
+				 </a>	
+			     <!-- <a><img id="video_month_path" src=""></a>-->
+			      <a class="facetime video ui corner label">
+			        <i class="facetime video icon"></i>
+			      </a>
+                  <a href="#openModal" class="fluid small ui button" onclick="upload_video();">Join</a>    
+			     <!-- <a onclick="window.open('http://www.braggn.com/mobile_upload_user.php?upload_type=video', '_system');" class="fluid small ui button">
+					Join
+				  </a>-->
+			    </div>
+			  </div>
+			</div>
+			<span class="text-muted" style="color:#0099CB">Competitions Entered</span>
+			<div class="ui divided list" id="comp_entered"></div>
+			<br/>
+			<!--<a href="" id="start_competition" class="competitionBtn">Start Competition</a>-->
+			<a href="#openModal" class="competitionBtn" onclick="start_comp();">Start Competition</a>
+			<div class="ui divider"></div>
+			<div id="badges">
+				<i class="star icon green"></i> <small class="text-muted">25 braggs</small>
+				<i class="star icon purple"></i> <small class="text-muted">50 braggs</small>
+				<i class="star icon orange"></i> <small class="text-muted">75 braggs</small>
+				<i class="star icon red"></i> <small class="text-muted">100 braggs</small>
+				<i class="star icon blue"></i> <small class="text-muted">150 braggs</small>
+				<i class="star icon yellow"></i> <small class="text-muted">200 braggs</small>
+				<i class="smile icon green"></i> <small class="text-muted">200 followers</small>
+				<i class="smile icon purple"></i> <small class="text-muted">300 followers</small>
+				<i class="smile icon yellow"></i> <small class="text-muted">500 followers</small>
+			</div>
+		</div>
+	</div>    
+	 <div id="openModal_video" class="modalDialog">
+		<div id="modal_video">
+			<a title="Close" class="close" onclick="go_competition();" style="font-size: 1rem;">X</a>
+			<iframe src="" scrolling="no" id="video_iframe" style="height:214px;width:270px;"></iframe>
+		</div>
+	</div>
+      <div id="openModal" class="modalDialog_profile">
+        <div id="modal_div">
+            <a title="Close" class="close" onclick="go_competition();" style="font-size: 1rem;">X</a>
+            <iframe id="upload_frame" src="" style="height:461px;width:284px;"></iframe>
+        </div>
+     </div>
+	<footer class="rounded">
+		&copy; BraggN
+	</footer>	
+	<script src="js/semantic.min.js"></script>
+	<script type="text/javascript">
+		$('.demo.sidebar').first()
+		  .sidebar('attach events', '.toggle.button')
+		;
+	</script>
+ </body>
+ </html>

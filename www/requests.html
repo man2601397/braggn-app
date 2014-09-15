@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>BraggN</title>
+	<link rel="stylesheet" href="css/mobile.css">
+	<link rel="stylesheet" href="css/semantic.css">    
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700' rel='stylesheet' type='text/css'>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+	<script src="js/general_function.js"></script>
+    <script type="text/javascript">        
+        $( document ).ready(function() {
+            //get session userid
+            var session_userid = window.localStorage.getItem("session_userid");
+           // alert(session_userid);
+            $.ajax({ 
+                type: 'POST',
+                url: 'http://www.braggn.com/mobile/mobile_user_friends_requests.php',
+				dataType: "json",
+                data: {
+						owner_user_id : session_userid
+                       // request: 'incoming'
+				},
+                  
+                success:function (response) {
+						if(response != ''){
+                            if(response.incoming != ''){                                                                       
+                              $.each(response.incoming, function(i, item) {
+                                    var username = response.incoming[i].user_info.user_username;
+								    var user_photo;
+                                    if(response.incoming[i].user_info.user_photo != ''){
+										user_photo = "http://www.braggn.com/uploads_user/1000/"+response.incoming[i].user_info.user_id+"/"+response.incoming[i].user_info.user_photo;
+									}else{
+										user_photo = "img/nophoto.gif";
+									}
+                                    $('#friend_requests').append(' <div class="eight wide column"><div class="ui segment"><img class="ui rounded mini left floated image" src="'+user_photo+'"> <a onclick="other_user_profile('+response.incoming[i].user_info.user_id+');" class="left floated">'+ response.incoming[i].user_info.user_username+'</a><br/><div class="ui left floated buttons"><div class="mini ui blue button" id="'+response.incoming[i].user_info.user_username+'" onclick="confirm_request(\''+username+'\');">Confirm</div><div class="mini ui button" onclick="cancel_request(\''+username+'\');">Ignore</div></div></div></div>');
+                                });                          
+                            }
+                            if(response.outgoing != ''){
+                                                                                
+                              $.each(response.outgoing, function(i, item) {
+                                    var username = response.outgoing[i].user_info.user_username;
+								  	var user_photo;
+								  	if(response.outgoing[i].user_info.user_photo != ''){
+                                    	user_photo = "http://www.braggn.com/uploads_user/1000/"+response.outgoing[i].user_info.user_id+"/"+response.outgoing[i].user_info.user_photo;
+									}else{
+										user_photo = "img/nophoto.gif";
+									}
+									$('#friend_requests').append(' <div class="eight wide column"><div class="ui segment"><img class="ui rounded mini left floated image" src="'+user_photo+'"> <a onclick="other_user_profile('+response.outgoing[i].user_info.user_id+');" class="left floated">'+ response.outgoing[i].user_info.user_username+'</a><br/><div class="ui left floated buttons"><div class="mini ui button" onclick="cancel_outgoing_request(\''+username+'\');">Cancel Request</div></div></div></div>');
+                                });         
+                                
+                            }
+						
+						}else{ 
+							  $('#friend_requests').removeClass('grid');
+                              $('#friend_requests').html('You don\'t have any friend request.');                            
+                        }                    
+                },
+                 error: function (){
+                    alert('error occured: Please try after some time.');
+                    return false;
+                 },
+            });		
+          
+       });  
+        
+        
+        </script>
+</head>
+ <body>
+ 	<div class="ui right thin blue vertical demo sidebar menu">
+		
+		<a class="item" href="index.html">
+			Home
+		</a>
+		<a class="item" href="activity.html">
+			BraggN Page
+		</a>
+		<a class="item" href="profile.html">
+			Profile
+		</a>
+		<a class="item" href="competition.html">
+			Competitions
+		</a>
+         <a class="active item" href="friends.html">
+			Friends
+		</a>
+		<a class="item" href="notifications.html">
+			Notifications
+		</a>
+          
+		<a class="item" href="settings.html">
+			Settings
+		</a>     
+        <a class="item" onclick="logout();">
+			<span>Logout</span>
+		</a>
+		<div class="item">
+			<b>More</b>
+		<div class="menu">
+		  <a href="aboutus.html" class="item">About</a>
+		  <a href="contactus.html" class="item">Contact Us</a>
+		</div>
+		</div>
+	</div>
+	<div data-role="page" id="mainPage" style="z-index: 9999">
+		<div data-role="content">
+			<header>
+            	<div id="social">
+					<ul>
+						<li><a href="https://www.facebook.com/pages/Braggncom/1392778994316222" target="_blank"><img src="img/fb.png"></a></li>
+                        <li><a href="https://twitter.com/braggncom" target="_blank"><img src="img/tw.png"></a></li>
+                        <li><a href="https://vine.co/braggn.com" target="_blank"><img src="img/vine-16.png"></a></li>
+                        <li><a href="http://instagram.com/braggncom" target="_blank"><img src="img/Instagram-16.png"></a></li>
+                        <li><a  href="https://plus.google.com/100216016506071395783" rel="publisher" target="_blank"><img src="img/google_circle-16.png"></a></li>
+					</ul>
+				</div>
+				<a href="index.html"><img src="img/BraggN_banner_animated.gif"></a>				
+			 </header>
+			<div id="intro_video">
+				<a href="http://www.braggn.com/include/BraggN-Intro-Animation-2A_sound.mp4" class="html5lightbox" data-width="400" data-height="250" title="LEARN ABOUT BRAGGN">
+					<img src="img/youtube.png">
+				</a>
+			</div>
+		 </div>	
+		<div id="content" class="rounded">
+			<div class="page-title left floated column">
+				<h2 class="ui left floated column">Friends</h2>
+			</div>
+			<div class="small ui green button icon toggle button right floated column" data-variation=".right">
+				<i class="reorder icon"></i>
+			</div>
+			<div class="ui feed">
+				<div class="clearfix">
+					<div class="ui left floated buttons">
+					  <div class="mini ui button" style="color:#0099cb" onclick="location.href='requests.html';">Requests</div>					  
+					  <div class="mini ui button" onclick="location.href='users.html';">Search Friends</div>
+					</div>
+				</div>
+				<br/>
+				<br/>
+				<div class="clearfix ui grid" id="friend_requests">				    
+			</div>
+		</div>
+	</div>
+	<footer class="rounded">
+		&copy; BraggN
+	</footer>
+	
+	<script src="js/semantic.min.js"></script>
+	<script type="text/javascript">
+		$('.demo.sidebar').first()
+		  .sidebar('attach events', '.toggle.button')
+		;		
+	</script>
+ </body>
+ </body>
+ </html>

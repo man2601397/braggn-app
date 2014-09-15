@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1" user-scalable="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>BraggN</title>
+      
+	<link rel="stylesheet" href="css/mobile.css">
+	<link rel="stylesheet" href="css/semantic.css">
+   <link rel="stylesheet" href="css/swipebox.min.css">
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700' rel='stylesheet' type='text/css'>	  
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+ </head>
+    
+ <body>
+     <div class="ui right thin blue vertical demo sidebar menu">
+		
+		<a class="item" href="index.html">
+			Home
+		</a>
+		<a class="item" href="activity.html">
+			BraggN Page
+		</a>
+		<a class="item" href="profile.html">
+			Profile
+		</a>
+		<a class="item" href="competition.html">
+			Competitions
+		</a>
+        <a class="item" href="friends.html">
+			Friends
+		</a>
+		<a class="item" href="notifications.html">
+			Notifications
+		</a>
+          
+		<a class="item" href="settings.html">
+			Settings
+		</a>     
+        <a class="item" onclick="logout();">
+			<span>Logout</span>
+		</a>
+		<div class="item">
+			<b>More</b>
+		<div class="menu">
+		  <a href="aboutus.html" class="active item">About</a>
+		  <a href="contactus.html" class="item">Contact Us</a>
+		</div>
+		</div>
+	</div>
+	<div data-role="page" id="mainPage" style="z-index: 9999">        
+		<div data-role="content">
+			<header>
+            	<div id="social">
+					<ul>
+						<li><a href="https://www.facebook.com/pages/Braggncom/1392778994316222" target="_blank"><img src="img/fb.png"></a></li>
+                        <li><a href="https://twitter.com/braggncom" target="_blank"><img src="img/tw.png"></a></li>
+                        <li><a href="https://vine.co/braggn.com" target="_blank"><img src="img/vine-16.png"></a></li>
+                        <li><a href="http://instagram.com/braggncom" target="_blank"><img src="img/Instagram-16.png"></a></li>
+                        <li><a  href="https://plus.google.com/100216016506071395783" rel="publisher" target="_blank"><img src="img/google_circle-16.png"></a></li>
+					</ul>
+				</div>
+				<a href="index.html"><img src="img/BraggN_banner_animated.gif"></a>				
+			 </header>
+			<div id="intro_video">
+				<a href="http://www.braggn.com/include/BraggN-Intro-Animation-2A_sound.mp4" class="html5lightbox" data-width="400" data-height="250" title="LEARN ABOUT BRAGGN">
+					<img src="img/youtube.png">
+				</a>
+			</div>
+		 </div>	
+		<div id="content" class="rounded">
+             <div class="page-title left floated column">
+				<h2 class="ui left floated column">About Us</h2>
+			</div>
+            <div class="small ui green button icon toggle button right floated column" data-variation=".right">
+				<i class="reorder icon"></i>
+			</div><br>
+			<div id="featuredphoto" class="clearfix">
+			<p><span class="blue">BraggN</span> is a site dedicated to making social media sharing fun. While most people upload their photos and videos online to share with their friends, family and the world, we take it a step further and make it fun. Why just upload, read people's comments and see how many likes you can get? BraggN takes all of it to the next level, with public and private competitions as well as video comment capabilities. </p>
+
+			<p>BraggN was inspired by the natural desire of competition in the human spirit. Braggn allows its users to create competitions to see whose photo or video will come out on top. Whose video is the funniest, most entertaining or whose slam dunk is the best. By allowing the users to set the parameters of their own competitions, the user can invite whomever they would like to participate in the competition and find out once and for all who is the "slam dunk king". </p>
+
+			<p>Monthly contests are also held and anyone can submit a photo or video to see who will get the "video of the month" or the "photo of the month". All users on BraggN can Bragg on an entry, and all users will see who comes out on top winning one of the monthly prizes. The site offers something for everyone and is a great way to stay entertained.</p>
+			</div>		
+			<div class="ui divider"></div>
+			<div id="badges">
+				<i class="star icon green"></i> <small class="text-muted">25 braggs</small>
+				<i class="star icon purple"></i> <small class="text-muted">50 braggs</small>
+				<i class="star icon orange"></i> <small class="text-muted">75 braggs</small>
+				<i class="star icon red"></i> <small class="text-muted">100 braggs</small>
+				<i class="star icon blue"></i> <small class="text-muted">150 braggs</small>
+				<i class="star icon yellow"></i> <small class="text-muted">200 braggs</small>
+				<i class="smile icon green"></i> <small class="text-muted">200 followers</small>
+				<i class="smile icon purple"></i> <small class="text-muted">300 followers</small>
+				<i class="smile icon yellow"></i> <small class="text-muted">500 followers</small>
+			</div>
+		</div>
+	</div>
+	<footer class="rounded">
+		&copy; BraggN
+	</footer>
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+	<script src="js/semantic.min.js"></script>
+	<script type="text/javascript">
+		$('.demo.sidebar').first().sidebar('attach events', '.toggle.button');
+	</script>
+	<script src="js/jquery.swipebox.min.js"></script>
+	<script type="text/javascript">
+		$('.swipebox').swipebox();
+	</script>
+ </body>
+ </html>

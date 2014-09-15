@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>BraggN</title>
+	<link rel="stylesheet" href="css/mobile.css">
+	<link rel="stylesheet" href="css/semantic.css">
+    <link rel="stylesheet" href="css/swipebox.min.css">
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700' rel='stylesheet' type='text/css'>
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="js/general_function.js"></script>
+    <script type="text/javascript">
+		
+		//get search keyword
+		var friends_search;
+		if(getUrlVars()["search"]){
+			friends_search = getUrlVars()["search"];
+				
+		}
+        //get session userid
+		var session_userid = window.localStorage.getItem("session_userid");
+        $( document ).ready(function() { 
+			load_users(); //Load deault users data
+          
+       });
+	   
+	     //Load more activity data
+        function load_more(page_id){
+            //Show ajax image before data loading
+            jQuery("#load_more").html("<img  src='img/ajax-loader3.gif' /> loading...");
+            load_users(page_id);
+						
+		}
+		
+		function load_users(page_id){
+			$.ajax({ 
+                type: 'POST',
+                url: 'http://www.braggn.com/mobile/mobile_users.php',
+				dataType: "json",
+                data: {
+						owner_user_id : session_userid,
+						page_s : page_id,
+					    user_keyword : friends_search
+				},
+                  
+                success:function (response) {
+						if(page_id){ //show after click on load more button
+							jQuery("#load_more").html("Load More...");								
+							var page_number = page_id+response.limit;							
+							if(page_number<response.total_users){
+								$('#pagination').show();
+								$('#load_more').attr("onclick","load_more("+page_number+")");
+							}else{
+								$('#pagination').hide();
+							}
+						}else{ //show default load more button 						 
+							if(response.limit>1 && response.total_users>response.limit){								
+								$('#pagination').show();
+								$('#load_more').attr("onclick","load_more("+response.limit+")");							
+							}else{                              
+								$('#pagination').hide();
+							}
+                        }
+						//load user data
+                        if(response){
+                          if(response.total_users>0){
+                            $('#total_users').show();
+                            $('#total_users').html('('+response.total_users+')');    
+                          }
+                          if(response.total_request>0){
+                            $('#sup_incoming_request').show();
+                            $('#sup_incoming_request').html(response.total_request);    
+                          }
+                              
+                          $.each(response, function(i, item) {								
+								$('#friends_info').append(' <div class="image item"><div class="ui segment"><img class="ui rounded small left floated image" src="'+response[i].user_info.user_photo+'"> <a onclick="other_user_profile('+response[i].user_info.user_id+');" >'+ response[i].user_info.user_username+'</a></div></div>');
+                            });                          
+                        }else{ 
+                             $('#friends_info').html('Don\'t have any users available yet.');                            
+                        }                    
+                },
+                 error: function (){
+                    alert('error occured: Please try after some time.');
+                    return false;
+                 },
+            });
+		}
+		function friend_search(){
+			var searchfriend = $('#search').val();
+			window.location= "users.html?search="+searchfriend;
+		}
+        </script>
+</head>
+ <body>
+ 	<div class="ui right thin blue vertical demo sidebar menu">
+		
+		<a class="item" href="index.html">
+			Home
+		</a>
+		<a class="item" href="activity.html">
+			BraggN Page
+		</a>
+		<a class="item" href="profile.html">
+			Profile
+		</a>
+		<a class="item" href="competition.html">
+			Competitions
+		</a>
+        <a class="active item" href="friends.html">
+			Friends
+		</a>
+		<a class="item" href="notifications.html">
+			Notifications
+		</a>
+          
+		<a class="item" href="settings.html">
+			Settings
+		</a>     
+        <a class="item" onclick="logout();">
+			<span>Logout</span>
+		</a>
+		<div class="item">
+			<b>More</b>
+			<div class="menu">
+			  <a href="aboutus.html" class="item">About</a>
+			  <a href="contactus.html" class="item">Contact Us</a>
+			</div>
+			<div class="menu">				
+				<input type="text" name="search" id="search" value="" size="14px" style="margin-left:20px">
+				<br><br><div class="floated tiny ui button" style="margin-left:20px"><a id="friend_search" name="friend_search" onclick="friend_search();">Search Friend</a></div>
+			</div><br>
+		</div>
+	</div>
+	<div data-role="page" id="mainPage" style="z-index: 9999">
+		<div data-role="content">
+			<header>
+            	<div id="social">
+					<ul>
+						<li><a href="https://www.facebook.com/pages/Braggncom/1392778994316222" target="_blank"><img src="img/fb.png"></a></li>
+                        <li><a href="https://twitter.com/braggncom" target="_blank"><img src="img/tw.png"></a></li>
+                        <li><a href="https://vine.co/braggn.com" target="_blank"><img src="img/vine-16.png"></a></li>
+                        <li><a href="http://instagram.com/braggncom" target="_blank"><img src="img/Instagram-16.png"></a></li>
+                        <li><a  href="https://plus.google.com/100216016506071395783" rel="publisher" target="_blank"><img src="img/google_circle-16.png"></a></li>
+					</ul>
+				</div>
+				<a href="index.html"><img src="img/BraggN_banner_animated.gif"></a>				
+			 </header>
+			<div id="intro_video">
+				<a href="http://www.braggn.com/include/BraggN-Intro-Animation-2A_sound.mp4" class="html5lightbox" data-width="400" data-height="250" title="LEARN ABOUT BRAGGN">
+					<img src="img/youtube.png">
+				</a>
+			</div>
+		 </div>	
+		<div id="content" class="rounded">
+			<div class="page-title left floated column">
+				<h2 class="ui left floated column">Search Friends<span id="total_users" style="display:none"></span></h2>
+			</div>
+			<div class="small ui green button icon toggle button right floated column" data-variation=".right">
+				<i class="reorder icon"></i>
+			</div>
+			<div class="ui feed">
+				<div class="clearfix">
+					<div class="ui left floated buttons">
+					  <div class="mini ui button" onclick="location.href='requests.html';">Requests<sup title="" id="sup_incoming_request" style="color:red;display:none" ></sup></div>
+					  <!--<div class="mini ui button" onclick="location.href='outgoingrequests.html';">Outgoing Requests</div>-->
+					  <div class="mini ui button" style="color:#0099cb"  onclick="location.href='users.html';">Search Friends</div>
+					</div>
+				</div>
+				<br/>
+				<br/>
+                <div class="ui segment divider"></div>
+			    <span class="text-muted" id="total_friends" style="display:none"></span>
+				<div class="ui two items" id="friends_info">				 				   
+				</div>
+                 <div id="pagination" style="display:none" class="small ui center aligned borderless pagination menu">
+			     <a class="item tiny ui button" id="load_more">Load More..</a>
+            </div>
+			</div>
+		</div>
+	</div>
+	<footer class="rounded">
+		&copy; BraggN
+	</footer>
+	
+	<script src="js/semantic.min.js"></script>
+	<script type="text/javascript">
+		$('.demo.sidebar').first()
+		  .sidebar('attach events', '.toggle.button')
+		;
+		$('.ui.dropdown').dropdown();
+	</script>
+ </body>
+ </body>
+ </html>

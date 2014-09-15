@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>Showactivity</title>
+	<link rel="stylesheet" href="css/mobile.css">
+	<link rel="stylesheet" href="css/semantic.css">
+	<link rel="stylesheet" href="css/swipebox.min.css">
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="js/bragg.js"></script>
+    <script src="js/general_function.js"></script>
+	
+    <style>
+        .modalDialog > div {
+            width: 236px;
+            height: 214px;
+            position: relative;
+            margin: 12% auto;
+            padding: 0px 38px 4px 0px;
+            border-radius: 8px;         
+        }
+    </style>
+    <script type="text/javascript">      
+        
+        var other_userid = getUrlVars()["other_userid"];
+        var owner_userid = getUrlVars()["owner_userid"];
+		var media_id = getUrlVars()["media_id"];
+        var back_url = getUrlVars()["back_url"];
+        var media_rank = getUrlVars()["media_rank"];
+        var no_total_comments;
+        var swipe_path;
+        var video_path;
+        var video_poster;
+        
+         $( document ).ready(function() {
+                $.ajax({ 
+                    type: 'POST',
+                    url: 'http://www.braggn.com/mobile/mobile_showfile.php',              
+                    dataType:'json',
+					data:{
+						other_userid : other_userid,
+						media_id:media_id	
+						
+					},                      
+                    success:function (response) {
+                           
+                            video_path  = response.media_dir_path;
+                            video_poster = response.media_path;
+                            no_total_comments = response.total_comments;
+                            $('#back_ref').attr('href', back_url);
+							$('#user_avatar').attr('src', response.owner_profile_photo);
+							$('#user_name').html(response.user_username);
+							$('#user_name').attr("onClick","other_user_profile("+other_userid+")");
+							$('#media_date').html(response.media_date);
+							$('#media_title').html(response.media_title);
+							
+                            //Add path for swipe path to enlarge images and show n hide media according to extension
+                            if(response.media_ext == 'mp4'){
+                                $('#image_id').hide();
+                                $('#video_id').show();
+                                $('#video_image').attr('src',response.media_path);
+								$('#video_id').after('<a class="facetime video ui corner label"> <i class="facetime video icon" style="font-size: 12px;padding-left: 22px;"></i></a>');
+                            }else{
+                                $('#image_id').show();
+                                $('#video_id').hide();
+                                $('#media_image').attr('src',response.media_dir_path);
+                                swipe_path = response.media_path;                               
+                                $('#image_id').attr('href',swipe_path+"?width=1200&height=1200&mode=max&quality=85");
+								$('#image_id').after('<a class="camera ui corner label" > <i class="camera icon" style="font-size: 12px;padding-left: 22px;"></i></a>');
+                            }
+                            
+                           
+							$('#media_description').html(response.media_description);
+							var bragg__id = response.bragg_id;
+                            
+                            // Show rank for competition entered
+                             if(media_rank){
+                                $('#media_rank').show();
+                                $('#media_rank').html("Rank #"+media_rank);
+                             }
+						
+							var comment_txt;
+							var bragg_txt;
+							
+							if(response.total_braggs>0 && response.total_braggs != ''){
+								bragg_txt = response.total_braggs +' bragg(s) ';
+							}else{
+								bragg_txt = 'No braggs';
+							}
+							
+							if(response.total_comments>0 && response.total_comments != ''){
+								comment_txt = response.total_comments+' comment(s)';
+							}else{
+								comment_txt = 'No comments';
+							}
+							
+                            // Applied class for brgg and unbragg
+                            if(bragg__id){
+								            $('#media_param').append('<a id="media_'+response.media_id+'"  class="timeago" onclick="update_bragg('+response.media_id+')">bragg / </a><a id="total_braggs_'+response.media_id+'">'+bragg_txt+' / </a><a id="total_comments_'+response.media_id+'">'+comment_txt+' </a><input type="hidden" id="bragg_value_'+response.media_id+'" value="Unbragg">');
+                            }else{
+                                    $('#media_param').append('<a id="media_'+response.media_id+'"  class="description" onclick="update_bragg('+response.media_id+')">bragg / </a><a id="total_braggs_'+response.media_id+'">'+bragg_txt+' / </a><a id="total_comments_'+response.media_id+'">'+comment_txt+' </a><input type="hidden" id="bragg_value_'+response.media_id+'" value="bragg">');
+                            }
+                        	
+                        // Add edit and delete button for owner view
+                        if(other_userid == owner_userid){
+							$('#media_param').append('<div class="actions" style="font-size:0.9em;margin:0 12.3em 0 0;"><a class="reply" id="media_edit_'+response.media_id+'" onclick="showeditmedia('+response.media_id+')" href="#openeditmedia" style="color: rgba(0, 0, 0, 0.3);display:inline-block">Edit</a>&nbsp;<a class="delete" id="media_delete_'+response.media_id+'" onclick="deleteMedia('+response.media_id+',\'' +back_url+'\')" style="color: rgba(0, 0, 0, 0.3);display:inline-block">Delete</a>');
+						}
+							
+							// Hide n show comment heading and horizontal row 
+				            if(response.total_comments>0){
+                                $('#comment_txt').show();
+                                $('#comment_divider').show();
+                                if(response.total_comments>3 && response.view_all_comments != 1){
+									$('#comment_txt').append('<span><a href="javascript:void(0);" onclick="OpenAllcomments();" id="view_more_comments" style="color: #999;float: right;">View More</a></span>');									
+								 }
+                                
+                            }else{
+                                $('#comment_txt').hide();
+                                $('#comment_divider').hide();
+                            }
+                        // Print media comments
+                           if( response.comment_arr){
+							 for ( var index = 0; index < response.comment_arr.length; index++ ) {								
+                                
+							     $('#comment_details').append('<div class="comment">  <a class="avatar"><img src="'+response.comment_arr[index].user_profile_photo+'"></a><div class="content"> <a class="author">'+response.comment_arr[index].user_username+'</a> <div class="metadata"><span class="date"><span class="date">'+response.comment_arr[index].comment_date+'</span></div><div class="text" contentEditable="false" id="comment_'+response.comment_arr[index].comment_id+'">'+response.comment_arr[index].media_comments+'</div><div class="actions" style="font-size:0.9em;margin:0 12.3em 0 0;"><a class="reply" id="comment_edit_'+response.comment_arr[index].comment_id+'" onclick="update_comments('+response.comment_arr[index].comment_id+');">Edit</a><a class="delete" id="comment_delete_'+response.comment_arr[index].comment_id+'" onclick="deleteComment('+response.comment_arr[index].comment_id+','+response.media_id+');" style="color: rgba(0, 0, 0, 0.3);display:inline-block">Delete</a></div></div></div>');
+                                
+							 }
+                           }
+                        // display text area for comment
+                        $('#comment_details').after('<br/><form class="ui reply form"><div class="field"><textarea id="edit_comment_'+response.media_id+'" maxlength="200"></textarea></div><br/><div class="ui fluid blue labeled submit icon button" onclick="insert_comments('+response.media_id+',1)"><i class="icon edit" ></i> Add Reply</div></form>');
+                    
+                    },
+                    
+                     error: function (){
+                        window.location= "index.html";
+                        return false;
+                     }
+                });					 
+			 
+          });
+		
+		        
+        // Show all comments
+        function OpenAllcomments(){
+				$.ajax({ 
+                type: 'POST',
+                url: 'http://www.braggn.com/mobile/mobile_showfile.php',
+                dataType:'json',
+                data: {
+		                  view_all_comments: 1,
+                          no_total_comments:no_total_comments,
+						  other_userid : other_userid,
+						  media_id:media_id
+                          
+                     },
+               success:function (response) {
+                   
+                  $('#view_more_comments').hide();				 
+				  if(response.comment_arr){
+					for ( var index = 0; index < response.comment_arr.length; index++ ) {								
+                                
+						$('#comment_details').append('<div class="comment">  <a class="avatar"><img src="'+response.comment_arr[index].user_profile_photo+'"></a><div class="content"> <a class="author">'+response.comment_arr[index].user_username+'</a> <div class="metadata"><span class="date"><span class="date">'+response.comment_arr[index].comment_date+'</span></div><div class="text" contentEditable="false" id="comment_'+response.comment_arr[index].comment_id+'">'+response.comment_arr[index].media_comments+'</div><div class="actions" style="font-size:0.9em;margin:0 12.3em 0 0;"><a class="reply" id="comment_edit_'+response.comment_arr[index].comment_id+'" onclick="update_comments('+response.comment_arr[index].comment_id+');">Edit</a><a class="delete" id="comment_delete_'+response.comment_arr[index].comment_id+'" onclick="deleteComment('+response.comment_arr[index].comment_id+','+response.media_id+');" style="color: rgba(0, 0, 0, 0.3);display:inline-block">Delete</a></div></div></div>');
+                                
+					}
+				}                
+                
+                },
+               error:function(){                   
+                   alert('error occured: please try after some time.');
+               },
+            });
+			
+		  }
+            
+        function showvideo(){               
+          
+            var video_url = 'http://www.braggn.com/mobile/mobile_play_video.php?video_path='+video_path+'&video_poster='+video_poster;
+            $('#video_iframe').attr('src', video_url);
+        }
+		
+		function showeditmedia(media_id){         
+           
+            $('#edit_media_iframe').attr('src', 'editmedia.html?media_id='+media_id);
+        }
+        
+        function go_showactivity(){           
+            window.location='showactivity.html?back_url='+back_url+'&other_userid='+other_userid+'&owner_userid='+owner_userid+'&media_id='+media_id;
+        }
+        
+    </script>
+ </head>
+ <body>
+	<div class="ui right thin blue vertical demo sidebar menu">
+		
+		<a class="item" href="index.html">
+			Home
+		</a>
+		<a class="active item" href="activity.html">
+			BraggN Page
+		</a>
+		<a class="item" href="profile.html">
+			Profile
+		</a>
+		<a class="item" href="competition.html">
+			Competitions
+		</a>
+        <a class="item" href="friends.html">
+			Friends
+		</a>
+		<a class="item" href="notifications.html">
+			Notifications
+		</a>
+         
+		<a class="item" href="settings.html">
+			Settings
+		</a>     
+        <a class="item" onclick="logout();">
+			<span>Logout</span>
+		</a>
+		<div class="item">
+			<b>More</b>
+		<div class="menu">
+		  <a href="aboutus.html" class="item">About</a>
+		  <a href="contactus.html" class="item">Contact Us</a>
+		</div>
+		</div>
+	</div>
+	<div data-role="page" id="mainPage" style="z-index: 9999">
+		<div data-role="content">
+			<header>
+            	<div id="social">
+					<ul>
+						<li><a href="https://www.facebook.com/pages/Braggncom/1392778994316222" target="_blank"><img src="img/fb.png"></a></li>
+                        <li><a href="https://twitter.com/braggncom" target="_blank"><img src="img/tw.png"></a></li>
+                        <li><a href="https://vine.co/braggn.com" target="_blank"><img src="img/vine-16.png"></a></li>
+                        <li><a href="http://instagram.com/braggncom" target="_blank"><img src="img/Instagram-16.png"></a></li>
+                        <li><a  href="https://plus.google.com/100216016506071395783" rel="publisher" target="_blank"><img src="img/google_circle-16.png"></a></li>
+					</ul>
+				</div>
+				<a href="index.html"><img src="img/BraggN_banner_animated.gif"></a>				
+			 </header>
+			<div id="intro_video">
+				<a href="http://www.braggn.com/include/BraggN-Intro-Animation-2A_sound.mp4" class="html5lightbox" data-width="400" data-height="250" title="LEARN ABOUT BRAGGN">
+					<img src="img/youtube.png">
+				</a>
+			</div>
+		 </div>	
+		<div id="content" class="rounded">
+			<a href="" id="back_ref" class="small ui button left floated column">
+				Back
+			</a>
+			<div class="small ui green button icon toggle button right floated column" data-variation=".right">
+				<i class="reorder icon"></i>
+			</div>
+			<br>
+			<div class="ui feed segment" id="media_details">
+			  <div class="event">
+			    <div class="label">
+			      <img id="user_avatar" src="">
+			    </div>
+			    <div class="content">
+			      <div class="summary">
+			         <a id="user_name"></a>
+			      </div>
+			      <div class="date" id="media_date"></div>
+			      <div class="extra image">
+			        <a class="clearfix feed-title" id="media_title"></a>
+			        <a class="swipebox" id="image_id" href="" title="Swipe screen to close" style="display:none">
+                        <img id="media_image" src=""  width="400">
+                    </a>
+                    <a href="#openModal" id="video_id" onclick="showvideo();" style="display:none">
+                        <img src="" id="video_image" border="0"  width="400"/>					
+				    </a>  
+			        <small class="clearfix" id="media_description"></small>
+                    <small class="clearfix" id="media_rank" style="display:none"></small>
+			      </div>
+			      <div class="ui green feed-count" id="media_param"></div>
+			    </div>
+			  </div>
+			</div>
+		    <div class="ui piled blue">
+		      <h4 class="ui header" id="comment_txt" style="display:none">
+		        Comments
+		      </h4>
+		      <div class="ui divider" id="comment_divider" style="display:none"></div>
+		      <div class="ui comments" id="comment_details"></div>
+		    </div>
+		</div>
+	</div>
+     <div id="openModal" class="modalDialog">
+        <div>
+            <a title="Close" class="close" onclick="go_showactivity();">X</a>
+            <iframe src="" scrolling="no" id="video_iframe" style="height:214px;width:270px;"></iframe>
+        </div>
+     </div>
+	 <div id="openeditmedia" class="modalDialog">
+        <div>
+            <a title="Close" class="close" onclick="go_showactivity();">X</a>
+            <iframe src="" scrolling="no" id="edit_media_iframe" style="height:270px;width:270px;"></iframe>
+        </div>
+     </div>
+	<footer class="rounded">
+		&copy; BraggN
+	</footer>
+	
+	<script src="js/jquery.swipebox.min.js"></script>
+	<script type="text/javascript">
+		//$('.swipebox').swipebox();
+		$(".swipebox").swipebox({useCSS:true, hideBarsDelay:0});
+	</script>
+	<script src="js/semantic.min.js"></script>
+	<script type="text/javascript">
+		$('.demo.sidebar').first()
+		  .sidebar('attach events', '.toggle.button')
+		;
+	</script>
+ </body>
+ </html>

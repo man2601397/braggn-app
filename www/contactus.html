@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>BraggN</title>
+	<link rel="stylesheet" href="css/mobile.css">
+	<link rel="stylesheet" href="css/semantic.css">
+    <link rel="stylesheet" href="css/swipebox.min.css">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700' rel='stylesheet' type='text/css'>	 
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+    <script src="js/bragg.js"></script> 
+    <script src="js/general_function.js"></script>
+    <script type="text/javascript">
+     
+         function clearContents(element) {
+             element.value = '';
+         } 
+        
+         function contactus(){            
+           
+            var contact_name     = $('#contact_name').val();
+            var contact_subject  = $('#contact_subject').val();
+            var contact_message  = $('#contact_message').val();
+            var contact_email    = $('#contact_email').val();
+          
+             if(contact_name ==''){
+                alert('Please provide your name.');
+                return false;
+            }else if(contact_message ==''){
+                alert('Please provide a detailed message.');
+                return false;
+            }          
+             
+            $.ajax({ 
+                type: 'POST',
+                url: 'http://www.braggn.com/mobile/mobile_contactus.php',
+                data: {
+		                  task: 'dosend',
+                          contact_name: contact_name,
+                          contact_subject : contact_subject,
+                          contact_message : contact_message,
+                          contact_email : contact_email
+                        
+                     },
+                  
+                success:function (data) {
+                    if(data == 1){
+                        alert('Thanks for contacting us. Your request has been submitted successfully.');
+                        $('#contact_name').val("");
+                        $('#contact_subject').val("");
+                        $('#contact_message').val("");
+                        $('#contact_email').val("");
+                        
+                    }else if(data == 698){
+                        alert('The email address you provided is not a valid email address.');
+                        fillValue(contact_name,contact_subject,contact_message,contact_email);
+                        return false;
+                    }else if(data == 1036){
+                        alert('Please provide a detailed message.');
+                        fillValue(contact_name,contact_subject,contact_message,contact_email);
+                        return false;
+                    }else if(data == 1046){
+                        alert('Please provide your name.');
+                        fillValue(contact_name,contact_subject,contact_message,contact_email);
+                        return false;
+                    }
+                    
+                },
+            });         
+        
+        }
+        
+        function fillValue(name,subject,msg,email){
+            $('#contact_name').val(name);
+            $('#contact_subject').val(subject);
+            $('#contact_message').val(msg);
+            $('#contact_email').val(email);
+            
+        }
+    </script>
+ </head>
+ <body>
+    <div class="ui right thin blue vertical demo sidebar menu">
+		
+		<a class="item" href="index.html">
+			Home
+		</a>
+		<a class="item" href="activity.html">
+			BraggN Page
+		</a>
+		<a class="item" href="profile.html">
+			Profile
+		</a>
+		<a class="item" href="competition.html">
+			Competitions
+		</a>
+        <a class="item" href="friends.html">
+			Friends
+		</a>
+		<a class="item" href="notifications.html">
+			Notifications
+		</a>
+          
+		<a class="item" href="settings.html">
+			Settings
+		</a>     
+        <a class="item" onclick="logout();">
+			<span>Logout</span>
+		</a>
+		<div class="item">
+			<b>More</b>
+		<div class="menu">
+		  <a href="aboutus.html" class="item">About</a>
+		  <a href="contactus.html" class="active item">Contact Us</a>
+		</div>
+		</div>
+	</div> 
+	<div data-role="page" id="mainPage" style="z-index: 9999">
+		<div data-role="content">
+			<header>
+            	<div id="social">
+					<ul>
+						<li><a href="https://www.facebook.com/pages/Braggncom/1392778994316222" target="_blank"><img src="img/fb.png"></a></li>
+                        <li><a href="https://twitter.com/braggncom" target="_blank"><img src="img/tw.png"></a></li>
+                        <li><a href="https://vine.co/braggn.com" target="_blank"><img src="img/vine-16.png"></a></li>
+                        <li><a href="http://instagram.com/braggncom" target="_blank"><img src="img/Instagram-16.png"></a></li>
+                        <li><a  href="https://plus.google.com/100216016506071395783" rel="publisher" target="_blank"><img src="img/google_circle-16.png"></a></li>
+					</ul>
+				</div>
+				<a href="index.html"><img src="img/BraggN_banner_animated.gif"></a>				
+			 </header>
+			<div id="intro_video">
+				<a href="http://www.braggn.com/include/BraggN-Intro-Animation-2A_sound.mp4" class="html5lightbox" data-width="400" data-height="250" title="LEARN ABOUT BRAGGN">
+					<img src="img/youtube.png">
+				</a>
+			</div>
+		 </div>		
+            <div class="small ui green button icon toggle button right floated column" data-variation=".right" style="margin:1em">
+				<i class="reorder icon"></i>
+			</div>
+		<div id="content" class="rounded">
+            <div class="page-title left floated column">
+				<h2 class="ui left floated column">Contact Us</h2>
+                
+			</div>
+            
+			<div class="ui fluid form" style="width:96%">
+			  <div class="two fields">
+			    <div class="field">
+			      <input type="text" name="contact_name" id="contact_name"  value="" size="30"  placeholder="Name" maxlength="30"/ onfocus="clearContents(this);">
+			    </div>
+			  </div>
+              <div class="field">
+                <input type="text" name="contact_email" id="contact_email"  value="" placeholder="Email Address" size="30" maxlength="30"/ onfocus="clearContents(this);"><br/>
+			  </div>    
+             <div class="field">
+                <input type="text" name="contact_subject" id="contact_subject"  value="" placeholder="Subject" size="30" maxlength="30"/ onfocus="clearContents(this);"><br/>
+			  </div>
+              <div class="field">
+			   <textarea cols="48" rows="8" name="contact_message" id="contact_message" placeholder="Message" onfocus="clearContents(this);"></textarea><br/>
+			  </div>			
+            </div>              
+			 <div class="ui blue submit button" onclick="contactus();">Submit</div>
+            
+		      <div class="ui divider"></div>
+			<div id="badges">
+				<i class="star icon green"></i> <small class="text-muted">25 braggs</small>
+				<i class="star icon purple"></i> <small class="text-muted">50 braggs</small>
+				<i class="star icon orange"></i> <small class="text-muted">75 braggs</small>
+				<i class="star icon red"></i> <small class="text-muted">100 braggs</small>
+				<i class="star icon blue"></i> <small class="text-muted">150 braggs</small>
+				<i class="star icon yellow"></i> <small class="text-muted">200 braggs</small>
+				<i class="smile icon green"></i> <small class="text-muted">200 followers</small>
+				<i class="smile icon purple"></i> <small class="text-muted">300 followers</small>
+				<i class="smile icon yellow"></i> <small class="text-muted">500 followers</small>
+			</div>	
+        </div>
+           
+		</div>
+	</div>
+	<footer class="rounded">
+		&copy; BraggN
+        <div>
+            &nbsp; <a href="mailto:braggn.com@hotmail.com" style="color:white">braggn.com@hotmail.com</a> 
+        </div>
+	</footer>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+	<script src="js/semantic.min.js"></script>
+	<script type="text/javascript">
+		$('.demo.sidebar').first().sidebar('attach events', '.toggle.button');
+	</script>
+	<script src="js/jquery.swipebox.min.js"></script>
+	<script type="text/javascript">
+		$('.swipebox').swipebox();
+	</script>
+ </body>
+ </html>

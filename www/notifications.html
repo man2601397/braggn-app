@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>BraggN</title>
+	<link rel="stylesheet" href="css/mobile.css">
+	<link rel="stylesheet" href="css/semantic.css">
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="js/bragg.js"></script>
+    <script src="js/general_function.js"></script>
+    <script type="text/javascript">
+            var msg_txt;
+            $( document ).ready(function() {   
+                $.ajax({ 
+                    type: 'POST',
+                    url: 'http://www.braggn.com/mobile/mobile_notification.php',              
+                    dataType:'json',
+                    data: {
+						//other_user_id : other_userid
+					},
+                      
+                    success:function (response) {
+                        
+                      if(response){
+                            
+                            owner_userid = response.owner_userid;
+                            user_userid = response.userid;
+                          
+                            //Follower section 
+                        if(response.recent_follower_user){
+                            $('#follower_data').show();
+                            $('#follower_avatar').attr('src', response.follower_profile_photo);
+                            $('#follower_date').html(response.following_date);
+                            $('#follower_name').html(response.recent_follower_user);
+                            $('#follower_name').attr('onclick', "other_user_profile("+response.follower_user_id +")");
+                        }    
+                        
+                         //Competition won section
+                        if(response.comp_won_username){                           
+                            $('#competition_won_data').show();
+                            $('#comp_won_date').html(response.comp_won_date);
+                            $('#comp_won_username').html(response.comp_won_username);
+                            $('#won_comp_title').html(response.won_comp_title);
+                        }    
+                            
+                            //Invited section
+                         if(response.fren_invited_by){
+                            $('#competition_invite_data').show();
+                            $('#comp_invite_avatar').attr('src', response.invited_user_photo);
+                            $('#comp_invite_date').html(response.invited_time);
+                            $('#comp_invite_username').html(response.fren_invited_by);
+                            $('#comp_invite_title').html(response.comp_invited_for); 
+                         }     
+                        
+                        //Messages section  
+                        var msg_id = [];                           
+                        if(response.user_total_unread_pms>0){
+							
+                            $('#message_data').show();                           
+                            $('#msg_link').html(response.user_total_unread_pms + ' unread ');
+							$.each(response.message_data, function(i, item) {								
+									$('#msg_data').append(' <span id="msg_txt">'+' \' '+response.message_data[i].pm_body+' \' '+'<br>&nbsp;&nbsp;- by <a id="msg_user" onclick="other_user_profile('+response.message_data[i].user_id +')">'+response.message_data[i].user_username+'</a> at <span class="date" id="msg_date">'+response.message_data[i].current_pm_date+'</span></span><br>');
+									msg_id.push(response.message_data[i].pmconvo_id);
+									}); 
+									msg_id = msg_id.join(',');
+									$('#all_msg_id').val(msg_id);
+										
+                         }
+						else if(response.user_total_unread_pms == ''){
+							$('#message_data').show();                           
+                            $('#msg_link').html('some recent');
+							$.each(response.message_data, function(i, item) {								
+								$('#msg_data').append(' <span id="msg_txt">'+' \' '+response.message_data[i].pm_body+' \' '+'<br>&nbsp;&nbsp;- by <a id="msg_user" onclick="other_user_profile('+response.message_data[i].pm_user.user_info.user_id +')">'+response.message_data[i].pm_user.user_info.user_username+'</a> at <span class="date" id="msg_date">'+response.message_data[i].pm_date+'</span></span><br>');								
+							});							
+						 }
+                        
+                            //Bragged section
+                         if(response.recent_bragged_byuser){
+                            $('#bragged_data').show();
+                            $('#bragged_date').html(response.bragged_date);
+                            $('#bragged_username').html(response.recent_bragged_byuser);
+                            $('#bragged_username').attr('onclick', "other_user_profile("+response.bragged_by_id +")");
+                            $('#media_path').attr('onclick', "show_media("+response.media_owner_id +","+response.media_id+")"); 
+                             
+                         }
+                      }else{
+                          $('#no_notify').html('You don\'t have any notifications recently.');    
+                      }
+                                                                                      
+                    },
+                     error: function (){
+                        window.location= "index.html";
+                        return false;
+                     }
+                });              
+              
+               //show unread message and change status as read
+                $("#msg_link").click(function(){
+					 var msgid_arr = $( "#all_msg_id" ).val();
+					 if(msgid_arr){
+						 $.ajax({ 
+							type: 'POST',
+							url: 'http://www.braggn.com/mobile/mobile_notification.php',
+							dataType: "json",
+							data: {
+									msg_ids : msgid_arr
+									
+							},
+							  
+							success:function (response) {
+								if(response){
+									$( "#all_msg_id" ).val("");	
+								}								
+							}                   
+						});
+					}
+					$( "#msg_data" ).toggle();	
+			  });   
+          });
+        
+        
+        //redirect to other user's profile    
+        function other_user_profile(userid){           				
+			 window.location='profile.html?user_id='+userid;            
+        }    
+        //show media details    
+        function show_media(owner_userid, media_id){           			
+			window.location='showactivity.html?back_url=notifications.html&owner_userid='+owner_userid+'&media_id='+media_id;
+        }       
+        
+    </script>
+ </head>
+ <body>
+	<div class="ui right thin blue vertical demo sidebar menu">
+		<div class="item ui icon input">
+		  <input type="text" placeholder="Search...">
+		</div>
+		<a class="item" href="index.html">
+			Home
+		</a>
+		<a class="item" href="activity.html">
+			BraggN Page
+		</a>
+		<a class=" item" href="profile.html">
+			Profile
+		</a>
+		<a class="item" href="competition.html">
+			Competitions
+		</a>
+        <a class="item" href="friends.html">
+			Friends
+		</a>
+		<a class="active item" href="notifications.html">
+			Notifications
+		</a>
+		<a class="item" href="settings.html">
+			Settings
+		</a>
+        <a class="item" onclick="logout();" >
+			<span >Logout</span>
+		</a>
+		<div class="item">
+			<b>More</b>
+		<div class="menu">
+		  <a href="aboutus.html"  class="item">About</a>
+		  <a href="contactus.html" class="item">Contact Us</a>
+		</div>
+		</div>
+	</div>
+	<div data-role="page" id="mainPage" style="z-index: 9999">
+		<div data-role="content">
+			<header>
+            	<div id="social">
+					<ul>
+						<li><a href="https://www.facebook.com/pages/Braggncom/1392778994316222" target="_blank"><img src="img/fb.png"></a></li>
+                        <li><a href="https://twitter.com/braggncom" target="_blank"><img src="img/tw.png"></a></li>
+                        <li><a href="https://vine.co/braggn.com" target="_blank"><img src="img/vine-16.png"></a></li>
+                        <li><a href="http://instagram.com/braggncom" target="_blank"><img src="img/Instagram-16.png"></a></li>
+                        <li><a  href="https://plus.google.com/100216016506071395783" rel="publisher" target="_blank"><img src="img/google_circle-16.png"></a></li>
+					</ul>
+				</div>
+				<a href="index.html"><img src="img/BraggN_banner_animated.gif"></a>				
+			 </header>
+			<div id="intro_video">
+				<a href="http://www.braggn.com/include/BraggN-Intro-Animation-2A_sound.mp4" class="html5lightbox" data-width="400" data-height="250" title="LEARN ABOUT BRAGGN">
+					<img src="img/youtube.png">
+				</a>
+			</div>
+		 </div>	
+		<div id="content" class="rounded">
+			<div class="page-title left floated column">
+				<h2 class="ui left floated column">Notifications</h2>
+			</div>
+            <div class="page-title left floated column" id="no_notify">
+				
+			</div>
+			<div class="small ui green button icon toggle button right floated column" data-variation=".right">
+				<i class="reorder icon"></i>
+			</div>
+			<div class="ui feed">
+				<div class="event" id="follower_data" style="display:none">
+					<div class="label">
+					  <img id ="follower_avatar" src="">
+					</div>
+					<div class="content">
+					  <div class="date" id="follower_date">
+					   
+					  </div>
+					  <div class="summary">
+					     <a id="follower_name" onclick=""></a> wants to follow you.
+					  </div>
+					</div>
+				</div>
+				<div class="event" id="competition_won_data" style="display:none">
+					<div class="label">
+					  <i class="circular trophy icon"></i>
+					</div>
+					<div class="content">
+					  <div class="date" id="comp_won_date">
+					    
+					  </div>
+					  <div class="summary">
+					    <a id="comp_won_username" onclick=""></a> won competition <a id="won_comp_title"></a>.
+					  </div>
+					</div>
+				</div>
+				<div class="event" id="competition_invite_data" style="display:none">
+					<div class="label">
+					  <img id="comp_invite_avatar" src="">
+					</div>
+					<div class="content">
+					  <div class="date" id="comp_invite_date">
+					   
+					  </div>
+					  <div class="summary">
+					     <a id="comp_invite_username" onclick=""></a> invited you to join competition <a id="comp_invite_title"></a>.
+					  </div>
+					</div>
+				</div>
+				<div class="event" id="message_data" style="display:none">
+					<div class="label">    
+					  <i class="circular chat icon"></i>
+					</div>
+					<div class="content">					  
+					  <div class="summary">
+					    You have <a id="msg_link"></a>  message(s)</a>.
+					  </div>                      
+					</div>
+				</div>
+                <div class="summary" id="msg_data" style="display:none;font-style: italic;color:grey;background:#f5f5f5">		
+				    <input type="hidden" id="all_msg_id" value=""/>
+                </div>
+				<div class="event" id="bragged_data" style="display:none">
+					<div class="label">
+					  <i class="circular star icon"></i>
+					</div>
+					<div class="content">
+					  <div class="date" id="bragged_date">
+					    
+					  </div>
+					  <div class="summary">
+					    <a id="bragged_username" onclick=""></a> bragged on your <a onclick="" id="media_path">post</a>.
+					  </div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<footer class="rounded">
+		&copy; BraggN
+	</footer>
+	<script src="js/semantic.min.js"></script>
+	<script type="text/javascript">
+		$('.demo.sidebar').first()
+  .sidebar('attach events', '.toggle.button')
+;
+	</script>
+ </body>
+ </html>
