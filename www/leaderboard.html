@@ -27,12 +27,16 @@
     <script src="js/bragg.js"></script>
     <script src="js/general_function.js"></script>
      <script type="text/javascript">           
-			        
+            
+            var compid = getUrlVars()["comp_id"];
             $( document ).ready(function() {   
                 $.ajax({ 
                     type: 'POST',
                     url: 'http://www.braggn.com/mobile/comp_leaderboard.php',              
-                    dataType:'json',                    
+                    dataType:'json',
+                    data: {
+						comp_id : compid						
+					},
                       
                     success:function (response) {
 						
@@ -41,10 +45,11 @@
                               $.each(response, function(i, item) {                                   
 									var media_dir = "http://www.braggn.com/uploads_user/1000/"+response[i].user_id+"/"+response.media_id+"."+response.media_ext;
 									var media_thumb = "http://www.braggn.com/uploads_user/1000/"+response[i].user_id+"/"+response[i].media_id+"_thumb.jpg";
-									$('#data_comp_leaderboard').append('<div id="top_leader_video"><img src="'+media_thumb+'" width="140" height="150" border="0"></a><p><span class="blue">Competition: </span>'+ response[i].comp_title+'<br><span class="blue">Uploaded by: </span>'+ response[i].user_username+'<br><span class="blue">Braggs: </span>'+ response[i].total_braggs +'<br><span class="blue">Rank: </span>'+'#'+ response[i].rank +'</p> </div>');						
+									$('#data_comp_leaderboard').append('<div id="top_leader_video"><img src="'+media_thumb+'" width="140" height="150" border="0" style="margin-left: 30px;"></a><p><span class="blue">Competition: </span>'+ response[i].comp_title+'<br><span class="blue">Uploaded by: </span>'+ response[i].user_username+'<br><span class="blue">Braggs: </span>'+ response[i].total_braggs +'<br><span class="blue">Rank: </span>'+'#'+ response[i].rank +'</p> </div>');						
 									
                                 });                                
                             }else{
+                                $('#data_comp_leaderboard').show();
 								$('#data_comp_leaderboard').html("No leaderboard available.");
 							}							
 						},                                                                  
