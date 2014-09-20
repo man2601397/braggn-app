@@ -92,6 +92,13 @@
 			var searchfriend = $('#search').val();
 			window.location= "users.html?search="+searchfriend;
 		}
+         $(function () {    
+            $('#click_request,#searchfriends').on('click touchend', function() { 
+				var link = $(this).attr('href');   
+				window.location = link; // opens in new window
+				return false; // prevent anchor click    
+			});    
+		});
         </script>
 </head>
  <body>
@@ -164,9 +171,8 @@
 			<div class="ui feed">
 				<div class="clearfix">
 					<div class="ui left floated buttons">
-					  <div class="mini ui button" onclick="location.href='requests.html';">Requests<sup title="" id="sup_incoming_request" style="color:red;display:none" ></sup></div>
-					  <!--<div class="mini ui button" onclick="location.href='outgoingrequests.html';">Outgoing Requests</div>-->
-					  <div class="mini ui button" style="color:#0099cb"  onclick="location.href='users.html';">Search Friends</div>
+					  <div class="mini ui button"><a href="requests.html" id="click_request">Requests<sup title="" id="sup_incoming_request" style="color:red;display:none" ></sup></a></div>
+					  <div class="mini ui button" style="color:#0099cb"><a href="users.html" id="searchfriends">Search Friends</a></div>
 					</div>
 				</div>
 				<br/>

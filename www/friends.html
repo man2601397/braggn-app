@@ -29,7 +29,8 @@
 		}
         //get session userid
         var session_userid = window.localStorage.getItem("session_userid");
-        $( document ).ready(function() {        
+        $( document ).ready(function() {
+                  
             load_friends();   //Load deault users data                   
                     
        });
@@ -105,11 +106,19 @@
 		
 		function clear_iframe(){          
             window.location='friends.html';
+            $('#upload_frame').hide();
         }
 		function friend_search(){
 			var searchfriend = $('#search').val();
 			window.location= "friends.html?search="+searchfriend;
 		}
+        $(function () {    
+            $('#click_request,#searchfriends,#showmessage').on('click touchend', function() { 
+				var link = $(this).attr('href');   
+				window.location = link; // opens in new window
+				return false; // prevent anchor click    
+			});    
+		});
         
     </script>
 </head>
@@ -183,8 +192,8 @@
 			<div class="ui feed">
 				<div class="clearfix">
 					<div class="ui left floated buttons">
-					  <div class="mini ui button" onclick="location.href='requests.html';">Requests<sup title="" id="sup_incoming_request" style="color:red;display:none" ></sup></div>					  
-					  <div class="mini ui button" id="search_friend" onclick="location.href='users.html';">Search Friends</div>
+					  <div class="mini ui button"><a href="requests.html" id="click_request">Requests<sup title="" id="sup_incoming_request" style="color:red;display:none" ></sup></a></div>					  
+					  <div class="mini ui button"><a href="users.html" id="searchfriends">Search Friends</a></div>
 					</div>
 				</div>
 				<br/>
@@ -193,7 +202,7 @@
 				<div>
 					<span class="text-muted" id="total_friends" style="display:none"></span>
 					<span id="compose_msg" class="right floated tiny ui button">				  
-					  <a href="#openModal" onclick="show_message();">Compose Message</a>
+					  <a href="#openModal" id="showmessage">Compose Message</a>
 					</span>
 				</div>
 				<div class="ui two items" id="friends_info"></div>
@@ -206,7 +215,7 @@
      <div id="openModal" class="modalDialog_profile">
         <div>
             <a title="Close" class="close" onclick="clear_iframe();">X</a>
-            <iframe id="upload_frame" src="" style="height:330px;width:284px;"></iframe>
+            <iframe id="upload_frame" src="http://www.braggn.com/mobile/mobile_user_messages_new.php?to_user=&to_id=" style="display:;height:330px;width:284px;"></iframe>
         </div>
      </div> 
 	<footer class="rounded">

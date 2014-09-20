@@ -24,7 +24,7 @@
         }
     </style>      
     <script type="text/javascript">
-         var ajax_data;
+        var ajax_data;
         $( document ).ready(function() {        
             $.ajax({ 
                 type: 'POST',
@@ -81,8 +81,15 @@
             var video_poster = 'img/youtube.png';
             var video_url = 'http://www.braggn.com/mobile/mobile_play_video.php?video_path='+video_path+'&video_poster='+video_poster;
             $('#video_iframe').attr('src', video_url);
-			$('#openModal').attr('style',' top: -105px');
+			$('#openModal').attr('style',' top: 105px');
 		}
+        $(function () {    
+            $('#login_anchor,#signup_anchor').on('click touchend', function() { 
+				var link = $(this).attr('href');   
+				window.location = link; // opens in new window
+				return false; // prevent anchor click    
+			});    
+		});
         </script>
    
  </head>
@@ -111,16 +118,16 @@
 		<div id="content" class="rounded">
             <nav class="clearfix rounded">
 				<div class="ui buttons">
-				  <div class="ui button"><a href="login.html">Login</a></div>
+				  <div class="ui button"><a id="login_anchor" href="login.html">Login</a></div>
 				  <div class="or"></div>
-				  <div class="ui positive button"><a href="signup.html">Sign Up</a></div>
+				  <div class="ui positive button"><a id="signup_anchor" href="signup.html">Sign Up</a></div>
 				</div>
 			</nav>
 			<h2>Why post for <i>Nothin'</i>, join <i>BraggN</i> and earn a little <i>Somethin'</i>!</h2>
 			
             <hr/>
             <!-- VIDEO OF THE MONTH -->           		
-			<div class="clearfix">              
+			<div id="featured-video">              
 				<h3 class="video_month_heading" style="font-size: 1.2em;">Video of the Month <span id="video_lastmonth"></span></h3>               
                 <!--	
                 <a href="#openModal" onclick="showvideo();">

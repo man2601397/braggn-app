@@ -191,6 +191,13 @@
         function go_showactivity(){           
             window.location='showactivity.html?back_url='+back_url+'&other_userid='+other_userid+'&owner_userid='+owner_userid+'&media_id='+media_id;
         }
+         $(function () {    
+            $('#back_ref').on('click touchend', function() { 
+				var link = $(this).attr('href');   
+				window.location = link; // opens in new window
+				return false; // prevent anchor click    
+			});    
+		});
         
     </script>
  </head>

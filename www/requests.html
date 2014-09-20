@@ -66,7 +66,13 @@
             });		
           
        });  
-        
+        $(function () {    
+            $('#click_request,#searchfriends').on('click touchend', function() { 
+				var link = $(this).attr('href');   
+				window.location = link; // opens in new window
+				return false; // prevent anchor click    
+			});    
+		});
         
         </script>
 </head>
@@ -136,8 +142,8 @@
 			<div class="ui feed">
 				<div class="clearfix">
 					<div class="ui left floated buttons">
-					  <div class="mini ui button" style="color:#0099cb" onclick="location.href='requests.html';">Requests</div>					  
-					  <div class="mini ui button" onclick="location.href='users.html';">Search Friends</div>
+					  <div class="mini ui button" style="color:#0099cb" ><a href="requests.html" id="click_request">Requests</a></div>					  
+					  <div class="mini ui button"><a href="users.html" id="searchfriends">Search Friends</a></div>
 					</div>
 				</div>
 				<br/>

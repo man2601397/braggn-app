@@ -21,7 +21,8 @@
             var owner_userid;
             var user_userid;
 		            
-            $( document ).ready(function() {   
+            $( document ).ready(function() {
+                
                 $.ajax({ 
                     type: 'POST',
                     url: 'http://www.braggn.com/mobile/mobile_profile.php',              
@@ -194,6 +195,8 @@
         
         function clear_iframe(){           
             window.location='profile.html';
+            $('#upload_frame').hide();
+            $('#locker_frame').hide();
         }
         
         function upload_iframe(){
@@ -265,8 +268,7 @@
                 });
 			
 			}
-		function open_locker(){
-			
+		function open_locker(){			
             var locker_url = 'http://www.braggn.com/mobile/mobile_braggn_locker.php';
             $('#upload_frame').attr('src', locker_url);
 			$('#upload_frame').attr('style', 'height:422px;width:226px;');
@@ -277,9 +279,14 @@
 			var searchmedia = $('#search').val();
 			window.location= "profile.html?search="+searchmedia;
 		}
-        function list_follow(followtag){
-			window.location= "follower_details.html?followtag="+followtag;			
-		}
+        
+        $(function () {    
+            $('#following_anchor,#followers_anchor,#uploadbtn,#lockers').on('click touchend', function() { 
+				var link = $(this).attr('href');   
+				window.location = link; // opens in new window
+				return false; // prevent anchor click    
+			});    
+		});
 		
         </script>
  </head>
@@ -359,23 +366,23 @@
 				</div><br>
 				<div class="lockerLogin">
 					<div class="ui left floated buttons">
-					  <a onclick="list_follow('followers');"> <span class="mini ui button" id="user_followers" style="display:none"></span></a><br>
-					  <a onclick="list_follow('following');"> <span class="mini ui button" id="user_following" style="display:none"></span></a>
+					  <a id="followers_anchor" href="follower_details.html?followtag=followers"> <span class="mini ui button" id="user_followers" style="display:none"></span></a><br>
+					  <a id="following_anchor" href="follower_details.html?followtag=following"> <span class="mini ui button" id="user_following" style="display:none"></span></a>
 					</div>
 					<div class="mini ui green right floated button" id="user_follow" style="display:none"></div>
 				</div>
 			</div>
 			<div>
-				<a id="lockers" href="#openModal" class="locker" onclick="open_locker();"> </a>				
+				<a id="lockers" href="#openModal_locker" class="locker"> </a>				
             </div>
-            <div class="clearfix" id="private_profile" style="display:none">
+            <div id="private_profile" style="display:none">
 				<div class="ui info message">
 				    <em class="left floated">This user has decided to keep their profile private. Click <a id="send_request" onclick="">here</a> to send them a request if you would like to be friends.</em>
 				</div>
 			</div>
 			<div class="ui segment divider" id="data_divider"></div>
 			<span class="text-muted" id="number_post"></span>
-            <div id="upload_btn" class="right floated tiny ui button" style="display:none"><a href="#openModal" onclick="upload_iframe();">Upload</a></div>
+            <div id="upload_btn" class="right floated tiny ui button" style="display:none"><a href="#openModal_upload" id="uploadbtn">Upload</a></div>
 			<div class="ui two items" id="post_data">			
 			</div>
 			<div id="pagination" style="display:none" class="small ui center aligned borderless pagination menu">
@@ -395,13 +402,19 @@
 			</div>
 		</div>
 	 <input type="hidden" name="userid" id="userid" value="" />
-      <div id="openModal" class="modalDialog_profile">
+      <div id="openModal_upload" class="modalDialog_profile">
         <div>
             <a title="Close" class="close" onclick="clear_iframe();">X</a>
-            <iframe id="upload_frame" src="" style="height:461px;width:284px;"></iframe>
+            <iframe id="upload_frame" src="http://www.braggn.com/mobile/mobile_upload_user.php" style="height:461px;width:284px;"></iframe>
         </div>
-     </div>    
      </div>
+     <div id="openModal_locker" class="braggn_locker">
+        <div>
+            <a title="Close" class="close" onclick="clear_iframe();">X</a>
+            <iframe id="locker_frame" scrolling="no" src="http://www.braggn.com/mobile/mobile_braggn_locker.php" style="height:422px;width:226px;"></iframe>
+        </div>
+     </div>
+     </div>			
     
 	<footer class="rounded">
 		&copy; BraggN
