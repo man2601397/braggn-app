@@ -64,14 +64,14 @@
                                 $('#image_id').hide();
                                 $('#video_id').show();
                                 $('#video_image').attr('src',response.media_path);
-								$('#video_id').after('<a class="facetime video ui corner label"> <i class="facetime video icon" style="font-size: 12px;padding-left: 22px;"></i></a>');
+								//$('#video_id').after('<a class="facetime video ui corner label"> <i class="facetime video icon" style="font-size: 12px;padding-left: 22px;"></i></a>');
                             }else{
                                 $('#image_id').show();
                                 $('#video_id').hide();
                                 $('#media_image').attr('src',response.media_dir_path);
                                 swipe_path = response.media_path;                               
                                 $('#image_id').attr('href',swipe_path+"?width=1200&height=1200&mode=max&quality=85");
-								$('#image_id').after('<a class="camera ui corner label" > <i class="camera icon" style="font-size: 12px;padding-left: 22px;"></i></a>');
+								//$('#image_id').after('<a class="camera ui corner label" > <i class="camera icon" style="font-size: 12px;padding-left: 22px;"></i></a>');
                             }
                             
                            

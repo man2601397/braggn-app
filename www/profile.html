@@ -55,21 +55,30 @@
                             user_userid = response.userid; 
                             // Store userid in localstorage for further usage 
                             window.localStorage.setItem("session_userid", owner_userid);
-                                                 
-                            //show follower
-                            if(response.follower_count>0){
-                                $('#user_followers').show();
-                            }
-                            if(response.following_count>0){
-                                $('#user_following').show();
+                            
+                            if(owner_userid == user_userid){
+                                //Show braggn locker
+                                $('#lockers_img').show();
+                                //show upload button if owner only                                 
+                                $('#upload_btn').show();
+                            
+                                
+                                //show follower users
+                                if(response.follower_count>0){
+                                    $('#user_followers').show();
+                                    $('#user_followers').html(response.follower_count+' Followers');
+                                }
+                                //show following users
+                                if(response.following_count>0){
+                                    $('#user_following').show();
+                                    $('#user_following').html(response.following_count+' following');
+                                }
                             }
                             //show owner details                    
                             $('#userid').val(response.userid);
                             $('#user_name').html(response.user_username);
                             $('#user_avatar').attr('src', response.user_profile_photo);
-                            $('#user_description').html(response.user_userdescription);
-                            $('#user_followers').html(response.follower_count+' Followers');
-                            $('#user_following').html(response.following_count+' following');
+                            $('#user_description').html(response.user_userdescription);                           
                             
                             //SHOW N HIDE NUMBER OF POST IF POST EXISTS
                             if(response.posts_count>0){
@@ -84,12 +93,7 @@
 								$('#load_more').attr("onclick","load_more(2)");							
                             }else{                              
                                 $('#pagination').hide();
-                            }
-                            
-                            //show upload button if owner only 
-                             if(owner_userid == user_userid){
-                                $('#upload_btn').show();
-                             }
+                            }                        
                             
                             //show follow button for non-owner users
                             var follow;
@@ -364,15 +368,15 @@
 					<a id="user_name"></a><br>
 					<span class="text-muted" id="user_description"></span><br>
 				</div><br>
-				<div class="lockerLogin">
+				<div class="lockerLogin" >
 					<div class="ui left floated buttons">
-					  <a id="followers_anchor" href="follower_details.html?followtag=followers"> <span class="mini ui button" id="user_followers" style="display:none"></span></a><br>
-					  <a id="following_anchor" href="follower_details.html?followtag=following"> <span class="mini ui button" id="user_following" style="display:none"></span></a>
+					  <a id="followers_anchor" href="follower_details.html?followtag=followers&back_url=profile.html"> <span class="mini ui button" id="user_followers" style="display:none"></span></a><br>
+					  <a id="following_anchor" href="follower_details.html?followtag=following&back_url=profile.html"> <span class="mini ui button" id="user_following" style="display:none"></span></a>
 					</div>
 					<div class="mini ui green right floated button" id="user_follow" style="display:none"></div>
 				</div>
 			</div>
-			<div>
+			<div id="lockers_img" style="display:none">
 				<a id="lockers" href="#openModal_locker" class="locker"> </a>				
             </div>
             <div id="private_profile" style="display:none">
@@ -405,7 +409,7 @@
       <div id="openModal_upload" class="modalDialog_profile">
         <div>
             <a title="Close" class="close" onclick="clear_iframe();">X</a>
-            <iframe id="upload_frame" src="http://www.braggn.com/mobile/mobile_upload_user.php" style="height:461px;width:284px;"></iframe>
+            <iframe id="upload_frame" src="http://www.braggn.com/mobile/mobile_upload_user.php" style="height:461px;width:284px;"></iframe>           
         </div>
      </div>
      <div id="openModal_locker" class="braggn_locker">

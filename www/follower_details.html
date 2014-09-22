@@ -16,14 +16,18 @@
     <script type="text/javascript">
 		
 		var followtag;
+        var back_url; 
 		if(getUrlVars()["followtag"]){
-				followtag = getUrlVars()["followtag"];
-				
-			}
+            followtag = getUrlVars()["followtag"];				
+        }
+        if(getUrlVars()["back_url"]){
+            back_url = getUrlVars()["back_url"];				
+        }
         //get session userid
         var session_userid = window.localStorage.getItem("session_userid");
         $( document ).ready(function() {        
-            load_followers();   //Load deault users data                   
+            load_followers();   //Load deault users data
+             $('#back_ref').attr('href', back_url);
                     
         });       
              
@@ -56,7 +60,8 @@
                     return false;
                  },
             });            
-        }		
+        }
+       
 				
     </script>
 </head>
@@ -116,7 +121,10 @@
 				</a>
 			</div>
 		 </div>	
-		<div id="content" class="rounded"> 			
+		<div id="content" class="rounded">
+            <a href="" id="back_ref" class="small ui button left floated column">
+				Back
+			</a>
 			<div class="small ui green button icon toggle button right floated column" data-variation=".right">
 				<i class="reorder icon"></i>
 			</div>
